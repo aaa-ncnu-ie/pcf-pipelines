@@ -45,7 +45,7 @@ resources:
   type: git
   source:
     uri: https://github.com/aaa-ncnu-ie/pcf-pipelines.git
-    branch: master
+    branch: prod
     username: {{github_token}}
 
 - name: pivnet-opsmgr
