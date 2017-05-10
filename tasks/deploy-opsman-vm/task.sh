@@ -57,9 +57,9 @@ EOF
   echo $IAAS_CONFIGURATION > ./opsman_settings.json
 
   cat ./opsman_settings.json
-
+  
   echo "Importing OVA of new OpsMgr VM..."
-  echo "Running govc import.ova -options=opsman_settings.json -k=true ${OPSMAN_PATH}"
+  echo "Running govc import.ova -options=opsman_settings.json -folder=/${GOVC_DATACENTER}/${OPSMAN_VM_FOLDER} -k=true ${OPSMAN_PATH}"
   ./${CMD_PATH} import.ova -options=opsman_settings.json -folder=/${GOVC_DATACENTER}/${OPSMAN_VM_FOLDER} -k=true ${OPSMAN_PATH}
   #
   # echo "Setting CPUs on new OpsMgr VM... /${GOVC_DATACENTER}/${OPSMAN_VM_FOLDER}/${OPSMAN_NAME}"
