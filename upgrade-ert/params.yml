@@ -24,7 +24,7 @@ opsman_admin_password: 2DssQ*43,FLBUd7
 opsman_uri: https://opsmandev.sandbox.gdc.digital.pncie.com
 
 # A github access key to download github binary releases E.g. https://github.com/pivotal-cf/om
-github_token: b53d7310940836b23832302136f605a38e4e64ac
+github_token: 19de8acb3fed8a2b02f64e4627d8cc423d946388
 
 # The IaaS name for which stemcell to download. See
 # https://github.com/pivotal-cf/pcf-product-stemcell-downloader/ for the list of
