@@ -1,5 +1,5 @@
 **/credentials.yml
-**/params.yml
+**/params*.yml
 **/key.txt
 .envrc
 .DS_Store

@@ -27,8 +27,8 @@ resources:
 - name: pcf-pipelines
   type: git
   source:
-    uri: https://github.com/pivotal-cf/pcf-pipelines.git
-    branch: master
+    uri: https://github.com/aaa-ncnu-ie/pcf-pipelines.git
+    branch: prod
     username: {{github_token}}
 
 - name: tool-om
@@ -78,7 +78,7 @@ jobs:
   - aggregate:
     - get: pivnet-product
       resource: elastic-runtime
-      trigger: true 
+      trigger: true
       passed: [regulator]
       params:
         globs:
