@@ -35,4 +35,18 @@ function main() {
       --decryption-passphrase "${OPSMAN_PASSPHRASE}"
  }
 
+ sudo apt-get update
+ sudo apt-get install sshpass
+
+ echo "Updating routes on opsman"
+
+ echo "Setting  ${ROUTE1}"
+ sshpass -e ssh -o StrictHostKeyChecking=no ubuntu@${OPSMAN_IP} ${ROUTE1}
+ echo "Setting  ${ROUTE2}"
+ sshpass -e ssh -o StrictHostKeyChecking=no ubuntu@${OPSMAN_IP} ${ROUTE2}
+ echo "Setting  ${ROUTE3}"
+ sshpass -e ssh -o StrictHostKeyChecking=no ubuntu@${OPSMAN_IP} ${ROUTE3}
+ echo "Setting  ${ROUTE4}"
+ sshpass -e ssh -o StrictHostKeyChecking=no ubuntu@${OPSMAN_IP} ${ROUTE4}
+ 
  main "${PWD}"

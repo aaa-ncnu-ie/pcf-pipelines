@@ -30,6 +30,12 @@ params:
   OPSMAN_PASSPHRASE:
   OPSMAN_URI:
   OPSMAN_SETTINGS_FILENAME:
+  OPSMAN_IP:
+  SSHPASS:
+  ROUTE1:
+  ROUTE2:
+  ROUTE3:
+  ROUTE4:
 
 run:
   path: pcf-pipelines/tasks/import-opsmgr-settings/task.sh
