@@ -3,7 +3,7 @@
 # PCF Backup using CFOps
 
 This is an example of a Concourse CI pipeline that performs automated nightly backups of a complete PCF deployment by using the [CFOps backup tool](http://www.cfops.io/).  
-The pipeline also demonstrates the integration of backup scripts with a shared file storage system via ```scp``` in order to store the created backup files and to perform the cleanup of older backup files from it.
+The pipeline also demonstrates the integration of backup scripts with a shared file storage system via ```aws``` in order to store the created backup files. The ```s3``` bucket should be configured to cleanup older backups as per your retention policy.
 
 ![Pipeline screenshot](https://raw.githubusercontent.com/pivotalservices/concourse-pipeline-samples/master/common/images/pcf-cfops-backup-pipeline.jpg)
 
@@ -57,7 +57,7 @@ backups
 The CFOps tool and its additional plugins for MySQL, Redit and RabbitMQ are all installed as part of the Docker image used by the pipelines tasks.   
 If any customization of the pipeline is done to perform the backup of any additional PCF component not covered in this sample, then the corresponding CFOps plugin for that component needs to be either installed as part of the Docker image or explicitly installed/added to the backup scripts procedures.
 
-##### The CleanUp job
+##### The CleanUp job- Only used for SCP backup
 In the "CleanUp" tab of the pipeline, a single job is defined to perform a nightly cleanup of old backup files in the shared file storage system. The number of days to keep files in the server is controlled by a configuration property when the pipeline is created in Concourse. See more details in the section below.
 
 ![Cleanup pipeline screenshot](https://raw.githubusercontent.com/pivotalservices/concourse-pipeline-samples/master/common/images/pcf-cfops-backup-cleanup.jpg)
@@ -76,7 +76,7 @@ The requirements for this pipeline's setup are as follows:
 
 1. A deployed instance of PCF that is managed by an Ops Manager
 
-1. A shared file storage server that can be accessed via ```scp``` commands.
+1. s3 AWS bucket configured to store backups uaing ```aws``` commands.
 
 ## Pipeline setup and execution
 
@@ -93,10 +93,17 @@ How to setup this sample pipeline on your Concourse server:
   * Edit _ci/pipelines/credentials.yml_ and fill out all the required credentials:  
 _git-project-url:_ the URL of your code repository containing the pipeline scripts, if not using this repo.  
 _ops-manager-hostname:_ the hostname of the ops-manager instance   
-_ops-manager-ui-user:_ the web interface user ID of the Ops Manager instance   
-_ops-manager-ui-password:_ the password for the web interface user ID of the Ops Manager instance  
-_ops-manager-ssh-user:_ the Ops Manager ssh user ID  
-_ops-manager-ssh-password:_ the password for the Ops Manager ssh user ID  
+_ops-manager-ui-user:_ Uaa client created for Ops Manager   
+_ops-manager-ui-password:_ Client secret for the client above  
+_ops-manager-ssh-user:_ the Ops Manager ssh user ID example `ubuntu`
+_ops-manager-ssh-password:_ the password for the Ops Manager ssh user ID 
+_s3-bucket:_ s3 bucket name
+_s3-access-key:_ s3 access key
+_s3-secret-access-key:_ s3 secret
+_s3-endpoint:_ s3 endpoint URL eg https://bucket.s3.amazonaws.com
+_s3-signature-version:_ s3v2  # default to v2
+
+The following properties are needed for storing backups using SCP.
 _file-repo-ip:_ the file repository's ip address or hostname   
 _file-repo-user:_ the file repository's user ID for the scp commands   
 _file-repo-password:_ the password for the file repository's user ID   
