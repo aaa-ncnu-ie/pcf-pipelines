@@ -105,5 +105,5 @@ cd $BACKUP_ROOT_DIR
 #   aws --debug s3 mv . s3://${S3_BUCKET} --recursive
 # fi
 # Delete backup files from worker.
-cf $BUILD_DIR
+cd $BUILD_DIR
 rm -rf $BACKUP_ROOT_DIR
