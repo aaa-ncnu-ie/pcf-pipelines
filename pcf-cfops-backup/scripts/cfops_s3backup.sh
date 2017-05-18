@@ -35,9 +35,9 @@ mkdir -p $BACKUP_FILE_DESTINATION
 cd /usr/bin
 
 # set token
-# uaac target https://$OPS_MANAGER_HOSTNAME/uaa --skip-ssl-validation
-# uaac token client get $OPS_MANAGER_UI_USER -s $OPS_MANAGER_UI_PASSWORD
-# export CFOPS_ADMIN_TOKEN=$(uaac context | grep ".*access_token: " | sed -n -e "s/^.*access_token: //p")
+uaac target https://$OPS_MANAGER_HOSTNAME/uaa --skip-ssl-validation
+uaac token client get $OPS_MANAGER_UI_USER -s $OPS_MANAGER_UI_PASSWORD
+export CFOPS_ADMIN_TOKEN=$(uaac context | grep ".*access_token: " | sed -n -e "s/^.*access_token: //p")
 
 # TBD: Force all user sessions to finish on Ops Manager to avoid cfops failure
 # issue DELETE request to /api/v0/sessions
@@ -45,7 +45,7 @@ cd /usr/bin
 # Sample sequence of commands:
 #  uaac token owner get opsman YOUR-OPS_MAN_USERID-GOES-HERE -s "" -p YOUR-PASSWORD-GOES-HERE
 #  TOKEN="$(uaac context | awk '/^ *access_token\: *([a-zA-Z0-9.\/+\-_]+) *$/ {print $2}' -)"
-#  curl "https://<your-ops-man-ip-goes-here>/api/v0/sessions" -d ' ' -X DELETE -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/x-www-form-urlencoded" --insecure -vv
+curl "https://${OPS_MANAGER_HOSTNAME}/api/v0/sessions" -d ' ' -X DELETE -H "Authorization: Bearer ${CFOPS_ADMIN_TOKEN}" -H "Content-Type: application/x-www-form-urlencoded" --insecure -vv
 
 # for debugging purposes, check which tiles are available for cfops in the image
 cfops version
