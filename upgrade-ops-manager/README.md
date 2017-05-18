@@ -22,3 +22,17 @@ Required Scopes and authorities are :
 - scope (list):  opsman.admin
 - authorized grant types (list):  client_credentials
 - authorities (list):  opsman.admin
+
+### For vSphere Ops Manager upgrade:
+The sequence of steps followed is:
+1. Download the .ova and other dependencies.
+2. Check that Ops Manager is clear i.e. no deployments running or need to be run.
+3. Export Ops Manager settings and configuration.
+4. Import .ova file into vSphere.
+5. Stop Ops Manager VM
+6. Start *New* Ops Manager VM
+7. Import configuration and settings
+8. Download stemcells
+9. Add stemcells
+10. Apply changes
+**NOTE: ** Once you confirm that new Ops Manager is working fine, the old Ops Manager can be deleted in vSphere.
