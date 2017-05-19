@@ -5,7 +5,7 @@ groups:
   - backup-elastic-runtime
   - backup-mysql
   - backup-redis
-  - backup-rabbitmq
+#  - backup-rabbitmq
 # clean up of old backup files can be performed using an bucket lifecycle policy
 
 resources:
@@ -119,28 +119,28 @@ jobs:
       S3_SECRET_ACCESS_KEY: {{s3-secret-access-key}}
       S3_SIGNATURE_VERSION: {{s3-signature-version}}
 
-- name: backup-rabbitmq
-  serial: true
-  plan:
-  - get: pcf-backup-scripts
-    trigger: false
-  - get: trigger-daily
-    trigger: true
-    passed:
-      - backup-redis
-  - task: backup-rabbitmq
-    file: pcf-backup-scripts/pcf-cfops-backup/ci/tasks/cfops_s3backup.yml
-    params:
-      S3_ENDPOINT: {{s3-endpoint}}
-      TARGET_TILE: rabbitmq
-      OPS_MANAGER_HOSTNAME: {{ops-manager-hostname}}
+#- name: backup-rabbitmq
+#  serial: true
+#  plan:
+#  - get: pcf-backup-scripts
+#    trigger: false
+#  - get: trigger-daily
+#    trigger: true
+#    passed:
+#      - backup-redis
+#  - task: backup-rabbitmq
+#    file: pcf-backup-scripts/pcf-cfops-backup/ci/tasks/cfops_s3backup.yml
+#    params:
+#      S3_ENDPOINT: {{s3-endpoint}}
+#      TARGET_TILE: rabbitmq
+#      OPS_MANAGER_HOSTNAME: {{ops-manager-hostname}}
       # OPS_MANAGER_PRIVATE_IP_ADDRESS: {{ops-manager-private-ip}}
-      OPS_MANAGER_UI_USER: {{ops-manager-ui-user}}
-      OPS_MANAGER_UI_PASSWORD: {{ops-manager-ui-password}}
-      OPS_MANAGER_SSH_USER: {{ops-manager-ssh-user}}
-      OPS_MANAGER_SSH_PASSWORD: {{ops-manager-ssh-password}}
-      S3_ENDPOINT: {{s3-endpoint}}
-      S3_BUCKET: {{s3-bucket}}
-      S3_ACCESS_KEY_ID: {{s3-access-key}}
-      S3_SECRET_ACCESS_KEY: {{s3-secret-access-key}}
-      S3_SIGNATURE_VERSION: {{s3-signature-version}}
+#      OPS_MANAGER_UI_USER: {{ops-manager-ui-user}}
+#      OPS_MANAGER_UI_PASSWORD: {{ops-manager-ui-password}}
+#      OPS_MANAGER_SSH_USER: {{ops-manager-ssh-user}}
+#      OPS_MANAGER_SSH_PASSWORD: {{ops-manager-ssh-password}}
+#      S3_ENDPOINT: {{s3-endpoint}}
+#      S3_BUCKET: {{s3-bucket}}
+#      S3_ACCESS_KEY_ID: {{s3-access-key}}
+#      S3_SECRET_ACCESS_KEY: {{s3-secret-access-key}}
+#      S3_SIGNATURE_VERSION: {{s3-signature-version}}
