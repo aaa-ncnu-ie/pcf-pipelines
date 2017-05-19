@@ -12,9 +12,8 @@ resources:
 - name: pcf-backup-scripts
   type: git
   source:
-    branch: master
+    branch: prod
     uri: {{git-project-url}}
-    private_key: {{ssh-private-key}}
 - name: trigger-daily
   type: time
   source:
