@@ -62,7 +62,7 @@ resources:
     interval: 30m
     start: "12:00 AM"
     stop: "11:59 PM"
-    location: America/Los_Angeles
+    location: America/Phoenix
     days: [Sunday, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday]
 
 jobs:
@@ -110,7 +110,7 @@ jobs:
         ROUTE1: {{route-1}}
         ROUTE2: {{route-2}}
         ROUTE3: {{route-2}}
-        ROUTE4: {{route-4}}        
+        ROUTE4: {{route-4}}
     - task: exported-opsmgr-diagnostic-report
       file: pcf-pipelines/tasks/export-opsmgr-diagnostic-report/task.yml
       params:

@@ -19,6 +19,7 @@ resources:
   source:
     start: 1:00 AM
     stop: 11:59 PM
+    location: America/Phoenix
 
 jobs:
 - name: backup-opsman
