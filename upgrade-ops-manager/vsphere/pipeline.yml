@@ -145,7 +145,7 @@ jobs:
       SSHPASS: {{opsman_admin_password}}
       ROUTE1: {{route-1}}
       ROUTE2: {{route-2}}
-      ROUTE3: {{route-2}}
+      ROUTE3: {{route-3}}
       ROUTE4: {{route-4}}
 
   - task: download-stemcells
