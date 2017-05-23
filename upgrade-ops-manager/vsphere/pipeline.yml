@@ -131,7 +131,7 @@ jobs:
       NTP: {{ntp}}
       OPSMAN_NETWORK: {{opsman_network}}
       OPSMAN_VM_FOLDER: {{opsman_vm_folder}}
-      OPSMAN_ADMIN_PASSWORD: {{opsman_admin_password}}
+      OPSMAN_ADMIN_PASSWORD: {{opsman_ssh_password}}
 
   - task: import-opsmgr
     file: pcf-pipelines/tasks/import-opsmgr-settings/task.yml
@@ -142,7 +142,7 @@ jobs:
       OPSMAN_URI: {{opsman_uri}}
       OPSMAN_SETTINGS_FILENAME: installation.zip
       OPSMAN_IP: {{opsman_ip}}
-      SSHPASS: {{opsman_admin_password}}
+      SSHPASS: {{opsman_ssh_password}}
       ROUTE1: {{route-1}}
       ROUTE2: {{route-2}}
       ROUTE3: {{route-2}}
