@@ -3,3 +3,4 @@
 **/key.txt
 .envrc
 .DS_Store
+**/credentials*
