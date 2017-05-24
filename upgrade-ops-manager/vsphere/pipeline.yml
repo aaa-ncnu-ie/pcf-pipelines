@@ -105,7 +105,7 @@ jobs:
         OPSMAN_PASSWORD: {{opsman_admin_password}}
         OPSMAN_URI: {{opsman_uri}}
         OPSMAN_SETTINGS_FILENAME: installation.zip
-        
+
     - task: exported-opsmgr-diagnostic-report
       file: pcf-pipelines/tasks/export-opsmgr-diagnostic-report/task.yml
       params:
@@ -147,6 +147,8 @@ jobs:
       ROUTE2: {{route-2}}
       ROUTE3: {{route-3}}
       ROUTE4: {{route-4}}
+      KEY: {{key}}
+      CERT: {{cert}}
 
   - task: download-stemcells
     file: pcf-pipelines/tasks/download-pivnet-stemcells/task.yml

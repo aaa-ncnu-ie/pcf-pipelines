@@ -48,5 +48,21 @@ function main() {
  sshpass -e ssh -o StrictHostKeyChecking=no ubuntu@${OPSMAN_IP} ${ROUTE3}
  echo "Setting  ${ROUTE4}"
  sshpass -e ssh -o StrictHostKeyChecking=no ubuntu@${OPSMAN_IP} ${ROUTE4}
+
+ echo -e $CERT > /tmp/test.crt
+ echo -e $KEY > /tmp/test.key
+ sed -i 's/^ //g' /tmp/test.key
+ sed -i 's/^ //g' /tmp/test.crt
+
+ sshpass -e ssh -o StrictHostKeyChecking=no ubuntu@${OPSMAN_IP} sudo cp /var/tempest/cert/tempest.crt /var/tempest/cert/tempest.crt.old
+ sshpass -e ssh -o StrictHostKeyChecking=no ubuntu@${OPSMAN_IP} sudo cp /var/tempest/cert/tempest.key /var/tempest/cert/tempest.key.old
  
+ sshpass -e scp -o StrictHostKeyChecking=no /tmp/test.key ubuntu@${OPSMAN_IP}:/home/ubuntu/tempest1.key
+ sshpass -e scp -o StrictHostKeyChecking=no /tmp/test.crt ubuntu@${OPSMAN_IP}:/home/ubuntu/tempest1.crt
+
+ sshpass -e ssh -o StrictHostKeyChecking=no ubuntu@${OPSMAN_IP} sudo mv /home/ubuntu/tempest1.key /var/tempest/cert/tempest.key
+ sshpass -e ssh -o StrictHostKeyChecking=no ubuntu@${OPSMAN_IP} sudo mv /home/ubuntu/tempest1.crt /var/tempest/cert/tempest.crt
+
+ sshpass -e ssh -o StrictHostKeyChecking=no ubuntu@${OPSMAN_IP} sudo service nginx restart
+
  main "${PWD}"
