@@ -38,7 +38,7 @@ cd /usr/bin
 uaac target https://$OPS_MANAGER_HOSTNAME/uaa --skip-ssl-validation
 uaac token client get $OPS_MANAGER_UI_USER -s $OPS_MANAGER_UI_PASSWORD
 CFOPS_ADMIN_TOKEN=$(uaac context | grep ".*access_token: " | sed -n -e "s/^.*access_token: //p")
-echo "Logging out any logged in users tp opsman ui so backup can proceed."
+echo "Logging out any logged in users from opsman ui so backup can proceed."
 echo ""
 # TBD: Force all user sessions to finish on Ops Manager to avoid cfops failure
 # issue DELETE request to /api/v0/sessions
