@@ -4,7 +4,7 @@ groups:
   - backup-opsman
   - backup-elastic-runtime
   - backup-mysql
-  - backup-redis
+#  - backup-redis
 #  - backup-rabbitmq
 # clean up of old backup files can be performed using an bucket lifecycle policy
 
