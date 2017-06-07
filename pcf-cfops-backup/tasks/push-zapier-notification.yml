@@ -1,0 +1,7 @@
+
+---
+platform: linux
+inputs:
+  - { name: pcf-pipelines }
+run:
+  path: pcf-pipelines/pcf-cfops-backup/bin/push-zapier.sh

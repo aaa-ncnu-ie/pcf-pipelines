@@ -21,6 +21,12 @@ resources:
     start: 1:00 AM
     stop: 11:59 PM
     location: America/Phoenix
+- name: pcf-pipelines
+  type: git
+  source:
+    uri: ssh://git@ssh.github.com:443/aaa-ncnu-ie/pcf-pipleines.git
+    private_key: {{github_token}}
+    branch: prod
 
 jobs:
 - name: backup-opsman
@@ -78,6 +84,9 @@ jobs:
     trigger: false
   - get: trigger-daily
     trigger: true
+  - get: pcf-pipelines
+    resource: pcf-pipelines
+    trigger: true
     passed:
       - backup-elastic-runtime
   - task: backup-mysql
@@ -95,6 +104,12 @@ jobs:
       S3_SECRET_ACCESS_KEY: {{s3-secret-access-key}}
       S3_SIGNATURE_VERSION: {{s3-signature-version}}
       S3_ENDPOINT: {{s3-endpoint}}
+    on_sucess:
+       task: success-zapier-notification
+          file: pcf-pipelines/pcf-cfops-backup/tasks/push-zapier-notification.yml
+          image: ubuntu
+          params:
+            url: https://hooks.zapier.com/hooks/catch/2293640/9f6i5d/
 
 # name: backup-redis
 #  serial: true
