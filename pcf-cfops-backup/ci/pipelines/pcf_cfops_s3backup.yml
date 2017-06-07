@@ -84,11 +84,11 @@ jobs:
     trigger: false
   - get: trigger-daily
     trigger: true
+    passed:
+      - backup-elastic-runtime
   - get: pcf-pipelines
     resource: pcf-pipelines-resource
     trigger: true
-    passed:
-      - backup-elastic-runtime
   - task: backup-mysql
     file: pcf-backup-scripts/pcf-cfops-backup/ci/tasks/cfops_s3backup.yml
     params:
