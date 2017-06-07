@@ -21,10 +21,10 @@ resources:
     start: 1:00 AM
     stop: 11:59 PM
     location: America/Phoenix
-- name: pcf-pipelines
+- name: pcf-pipelines-resource
   type: git
   source:
-    uri: ssh://git@ssh.github.com:443/aaa-ncnu-ie/pcf-pipleines.git
+    uri: ssh://git@ssh.github.com:443/aaa-ncnu-ie/pcf-pipelines.git
     private_key: {{github_token}}
     branch: prod
 
@@ -85,7 +85,7 @@ jobs:
   - get: trigger-daily
     trigger: true
   - get: pcf-pipelines
-    resource: pcf-pipelines
+    resource: pcf-pipelines-resource
     trigger: true
     passed:
       - backup-elastic-runtime
