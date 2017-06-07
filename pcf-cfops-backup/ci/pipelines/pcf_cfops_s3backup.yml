@@ -105,11 +105,11 @@ jobs:
       S3_SIGNATURE_VERSION: {{s3-signature-version}}
       S3_ENDPOINT: {{s3-endpoint}}
     on_sucess:
-       task: success-zapier-notification
-          file: pcf-pipelines/pcf-cfops-backup/tasks/push-zapier-notification.yml
-          image: ubuntu
-          params:
-            url: https://hooks.zapier.com/hooks/catch/2293640/9f6i5d/
+      task: success-zapier-notification
+      file: pcf-pipelines/pcf-cfops-backup/tasks/push-zapier-notification.yml
+      image: ubuntu
+      params:
+        url: https://hooks.zapier.com/hooks/catch/2293640/9f6i5d/
 
 # name: backup-redis
 #  serial: true
