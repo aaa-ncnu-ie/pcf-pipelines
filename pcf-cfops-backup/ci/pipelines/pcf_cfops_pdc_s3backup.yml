@@ -21,6 +21,12 @@ resources:
     start: 1:00 AM
     stop: 11:59 PM
     location: America/Phoenix
+- name: pcf-pipelines-resource
+  type: git
+  source:
+    uri: ssh://git@ssh.github.com:443/aaa-ncnu-ie/pcf-pipelines.git
+    private_key: {{private-key}}
+    branch: prod
 
 jobs:
 - name: backup-opsman
@@ -29,6 +35,9 @@ jobs:
   - get: pcf-backup-scripts
     trigger: false
   - get: trigger-daily
+    trigger: true
+  - get: pcf-pipelines
+    resource: pcf-pipelines-resource
     trigger: true
   - task: backup-opsman
     file: pcf-backup-scripts/pcf-cfops-backup/ci/tasks/cfops_s3backup.yml
@@ -71,6 +80,9 @@ jobs:
     trigger: true
     passed:
       - backup-opsman
+  - get: pcf-pipelines
+    resource: pcf-pipelines-resource
+    trigger: true
   - task: backup-elastic-runtime
     file: pcf-backup-scripts/pcf-cfops-backup/ci/tasks/cfops_s3backup.yml
     params:
@@ -112,6 +124,9 @@ jobs:
     trigger: true
     passed:
       - backup-elastic-runtime
+  - get: pcf-pipelines
+    resource: pcf-pipelines-resource
+    trigger: true
   - task: backup-redis
     file: pcf-backup-scripts/pcf-cfops-backup/ci/tasks/cfops_s3backup.yml
     params:
