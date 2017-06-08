@@ -45,6 +45,22 @@ jobs:
       S3_ACCESS_KEY_ID: {{s3-access-key}}
       S3_SECRET_ACCESS_KEY: {{s3-secret-access-key}}
       S3_SIGNATURE_VERSION: {{s3-signature-version}}
+    on_success:
+      task: success-zapier-notification
+      file: pcf-pipelines/pcf-cfops-backup/tasks/push-zapier-notification.yml
+      params:
+        url: https://hooks.zapier.com/hooks/catch/2293640/9f6i5d/
+        pcf_env_backup: {{pcf_env}}
+        backup_product: OpsManager
+        passfail: success
+    on_failure:
+      task: success-zapier-notification
+      file: pcf-pipelines/pcf-cfops-backup/tasks/push-zapier-notification.yml
+      params:
+        url: https://hooks.zapier.com/hooks/catch/2293640/9f6i5d/
+        pcf_env_backup: {{pcf_env}}
+        backup_product: OpsManager
+        passfail: failure
 
 - name: backup-elastic-runtime
   serial: true
@@ -70,6 +86,22 @@ jobs:
       S3_ACCESS_KEY_ID: {{s3-access-key}}
       S3_SECRET_ACCESS_KEY: {{s3-secret-access-key}}
       S3_SIGNATURE_VERSION: {{s3-signature-version}}
+    on_success:
+      task: success-zapier-notification
+      file: pcf-pipelines/pcf-cfops-backup/tasks/push-zapier-notification.yml
+      params:
+        url: https://hooks.zapier.com/hooks/catch/2293640/9f6i5d/
+        pcf_env_backup: {{pcf_env}}
+        backup_product: elastic-runtime
+        passfail: success
+    on_failure:
+      task: success-zapier-notification
+      file: pcf-pipelines/pcf-cfops-backup/tasks/push-zapier-notification.yml
+      params:
+        url: https://hooks.zapier.com/hooks/catch/2293640/9f6i5d/
+        pcf_env_backup: {{pcf_env}}
+        backup_product: elastic-runtime
+        passfail: failure
 
 #- name: backup-mysql
 #  serial: true
