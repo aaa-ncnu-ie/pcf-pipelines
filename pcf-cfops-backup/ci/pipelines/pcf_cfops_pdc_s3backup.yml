@@ -103,6 +103,47 @@ jobs:
         backup_product: elastic-runtime
         passfail: failure
 
+- name: backup-redis
+  serial: true
+  plan:
+  - get: pcf-backup-scripts
+    trigger: false
+  - get: trigger-daily
+    trigger: true
+    passed:
+      - backup-elastic-runtime
+  - task: backup-redis
+    file: pcf-backup-scripts/pcf-cfops-backup/ci/tasks/cfops_s3backup.yml
+    params:
+      TARGET_TILE: redis-tile
+      OPS_MANAGER_HOSTNAME: {{ops-manager-hostname}}
+      # OPS_MANAGER_PRIVATE_IP_ADDRESS: {{ops-manager-private-ip}}
+      OPS_MANAGER_UI_USER: {{ops-manager-ui-user}}
+      OPS_MANAGER_UI_PASSWORD: {{ops-manager-ui-password}}
+      OPS_MANAGER_SSH_USER: {{ops-manager-ssh-user}}
+      OPS_MANAGER_SSH_PASSWORD: {{ops-manager-ssh-password}}
+      S3_ENDPOINT: {{s3-endpoint}}
+      S3_BUCKET: {{s3-bucket}}
+      S3_ACCESS_KEY_ID: {{s3-access-key}}
+      S3_SECRET_ACCESS_KEY: {{s3-secret-access-key}}
+      S3_SIGNATURE_VERSION: {{s3-signature-version}}
+    on_success:
+      task: success-zapier-notification
+      file: pcf-pipelines/pcf-cfops-backup/tasks/push-zapier-notification.yml
+      params:
+        url: https://hooks.zapier.com/hooks/catch/2293640/9f6i5d/
+        pcf_env_backup: {{pcf_env}}
+        backup_product: redis-tile
+        passfail: success
+    on_failure:
+      task: success-zapier-notification
+      file: pcf-pipelines/pcf-cfops-backup/tasks/push-zapier-notification.yml
+      params:
+        url: https://hooks.zapier.com/hooks/catch/2293640/9f6i5d/
+        pcf_env_backup: {{pcf_env}}
+        backup_product: redis-tile
+        passfail: failure
+
 #- name: backup-mysql
 #  serial: true
 #  plan:
@@ -128,30 +169,6 @@ jobs:
 #      S3_SIGNATURE_VERSION: {{s3-signature-version}}
 #      S3_ENDPOINT: {{s3-endpoint}}
 
-- name: backup-redis
-  serial: true
-  plan:
-  - get: pcf-backup-scripts
-    trigger: false
-  - get: trigger-daily
-    trigger: true
-    passed:
-      - backup-elastic-runtime
-  - task: backup-redis
-    file: pcf-backup-scripts/pcf-cfops-backup/ci/tasks/cfops_s3backup.yml
-    params:
-      TARGET_TILE: redis-tile
-      OPS_MANAGER_HOSTNAME: {{ops-manager-hostname}}
-      # OPS_MANAGER_PRIVATE_IP_ADDRESS: {{ops-manager-private-ip}}
-      OPS_MANAGER_UI_USER: {{ops-manager-ui-user}}
-      OPS_MANAGER_UI_PASSWORD: {{ops-manager-ui-password}}
-      OPS_MANAGER_SSH_USER: {{ops-manager-ssh-user}}
-      OPS_MANAGER_SSH_PASSWORD: {{ops-manager-ssh-password}}
-      S3_ENDPOINT: {{s3-endpoint}}
-      S3_BUCKET: {{s3-bucket}}
-      S3_ACCESS_KEY_ID: {{s3-access-key}}
-      S3_SECRET_ACCESS_KEY: {{s3-secret-access-key}}
-      S3_SIGNATURE_VERSION: {{s3-signature-version}}
 
 #- name: backup-rabbitmq
 #  serial: true
