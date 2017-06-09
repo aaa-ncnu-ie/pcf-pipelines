@@ -58,18 +58,20 @@ jobs:
       task: success-zapier-notification
       file: pcf-pipelines/pcf-cfops-backup/tasks/push-zapier-notification.yml
       params:
-        url: https://hooks.zapier.com/hooks/catch/2293640/9f6i5d/
+        url: {{zapier-webhook}}
         pcf_env_backup: {{pcf_env}}
         backup_product: OpsManager
         passfail: success
+        deadman: {{deadman-ops-man}}
     on_failure:
       task: success-zapier-notification
       file: pcf-pipelines/pcf-cfops-backup/tasks/push-zapier-notification.yml
       params:
-        url: https://hooks.zapier.com/hooks/catch/2293640/9f6i5d/
+        url: {{zapier-webhook}}
         pcf_env_backup: {{pcf_env}}
         backup_product: OpsManager
         passfail: failure
+        deadman: {{deadman-ops-man}}
 
 - name: backup-elastic-runtime
   serial: true
@@ -102,18 +104,20 @@ jobs:
       task: success-zapier-notification
       file: pcf-pipelines/pcf-cfops-backup/tasks/push-zapier-notification.yml
       params:
-        url: https://hooks.zapier.com/hooks/catch/2293640/9f6i5d/
+        url: {{zapier-webhook}}
         pcf_env_backup: {{pcf_env}}
         backup_product: elastic-runtime
         passfail: success
+        deadman: {{deadman-ert}}
     on_failure:
       task: success-zapier-notification
       file: pcf-pipelines/pcf-cfops-backup/tasks/push-zapier-notification.yml
       params:
-        url: https://hooks.zapier.com/hooks/catch/2293640/9f6i5d/
+        url: {{zapier-webhook}}
         pcf_env_backup: {{pcf_env}}
         backup_product: elastic-runtime
         passfail: failure
+        deadman: {{deadman-ert}}
 
 - name: backup-redis
   serial: true
@@ -146,18 +150,20 @@ jobs:
       task: success-zapier-notification
       file: pcf-pipelines/pcf-cfops-backup/tasks/push-zapier-notification.yml
       params:
-        url: https://hooks.zapier.com/hooks/catch/2293640/9f6i5d/
+        url: {{zapier-webhook}}
         pcf_env_backup: {{pcf_env}}
         backup_product: redis-tile
         passfail: success
+        deadman: {{deadman-redis}}
     on_failure:
       task: success-zapier-notification
       file: pcf-pipelines/pcf-cfops-backup/tasks/push-zapier-notification.yml
       params:
-        url: https://hooks.zapier.com/hooks/catch/2293640/9f6i5d/
+        url: {{zapier-webhook}}
         pcf_env_backup: {{pcf_env}}
         backup_product: redis-tile
         passfail: failure
+        deadman: {{deadman-redis}}
 
 #- name: backup-mysql
 #  serial: true
