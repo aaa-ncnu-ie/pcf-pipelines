@@ -38,7 +38,7 @@ jobs:
     trigger: true
   - get: pcf-pipelines
     resource: pcf-pipelines-resource
-    trigger: true
+    trigger: false
   - task: backup-opsman
     file: pcf-backup-scripts/pcf-cfops-backup/ci/tasks/cfops_s3backup.yml
     params:
@@ -84,7 +84,7 @@ jobs:
       - backup-opsman
   - get: pcf-pipelines
     resource: pcf-pipelines-resource
-    trigger: true
+    trigger: false
   - task: backup-elastic-runtime
     file: pcf-backup-scripts/pcf-cfops-backup/ci/tasks/cfops_s3backup.yml
     params:
@@ -130,7 +130,7 @@ jobs:
       - backup-elastic-runtime
   - get: pcf-pipelines
     resource: pcf-pipelines-resource
-    trigger: true
+    trigger: false
   - task: backup-redis
     file: pcf-backup-scripts/pcf-cfops-backup/ci/tasks/cfops_s3backup.yml
     params:
