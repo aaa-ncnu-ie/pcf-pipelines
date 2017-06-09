@@ -18,9 +18,8 @@ resources:
 - name: trigger-daily
   type: time
   source:
-    start: 1:00 AM
+    start: 7:00 AM
     stop: 11:59 PM
-    location: America/Phoenix
 - name: pcf-pipelines-resource
   type: git
   source:
