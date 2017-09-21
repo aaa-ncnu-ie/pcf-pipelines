@@ -40,15 +40,35 @@ function main() {
 
  echo "Updating routes on opsman"
 
- echo "Setting  ${ROUTE1}"
- echo "Running command: \"echo PASSWORD| sudo -S route add ${ROUTE1}\""
- sshpass -e ssh -t -o StrictHostKeyChecking=no ubuntu@${OPSMAN_IP} "echo ${SSHPASS}| sudo -S route add ${ROUTE1}"
- echo "Running command: \"echo PASSWORD| sudo -S route add ${ROUTE2}\""
- sshpass -e ssh -t -o StrictHostKeyChecking=no ubuntu@${OPSMAN_IP} "echo ${SSHPASS}| sudo -S route add ${ROUTE2}"
- echo "Running command: \"echo PASSWORD| sudo -S route add ${ROUTE3}\""
- sshpass -e ssh -t -o StrictHostKeyChecking=no ubuntu@${OPSMAN_IP} "echo ${SSHPASS}| sudo -S route add ${ROUTE3}"
- echo "Running command: \"echo PASSWORD| sudo -S route add ${ROUTE4}\""
- sshpass -e ssh -t -o StrictHostKeyChecking=no ubuntu@${OPSMAN_IP} "echo ${SSHPASS}| sudo -S route add ${ROUTE4}"
+ if [ -z "${ROUTE1##*net*}" ]; then
+   echo "Running command: \"echo PASSWORD| sudo -S route add ${ROUTE1}\""
+   sshpass -e ssh -t -o StrictHostKeyChecking=no ubuntu@${OPSMAN_IP} "echo ${SSHPASS}| sudo -S ${ROUTE1}"
+ fi
+
+ if [ -z "${ROUTE2##*net*}" ]; then
+   echo "Running command: \"echo PASSWORD| sudo -S route add ${ROUTE2}\""
+   sshpass -e ssh -t -o StrictHostKeyChecking=no ubuntu@${OPSMAN_IP} "echo ${SSHPASS}| sudo -S ${ROUTE2}"
+ fi
+
+ if [ -z "${ROUTE3##*net*}" ]; then
+   echo "Running command: \"echo PASSWORD| sudo -S route add ${ROUTE3}\""
+   sshpass -e ssh -t -o StrictHostKeyChecking=no ubuntu@${OPSMAN_IP} "echo ${SSHPASS}| sudo -S ${ROUTE3}"
+ fi
+
+ if [ -z "${ROUTE4##*net*}" ]; then
+   echo "Running command: \"echo PASSWORD| sudo -S route add ${ROUTE4}\""
+   sshpass -e ssh -t -o StrictHostKeyChecking=no ubuntu@${OPSMAN_IP} "echo ${SSHPASS}| sudo -S ${ROUTE4}"
+ fi
+
+ if [ -z "${ROUTE5##*net*}" ]; then
+   echo "Running command: \"echo PASSWORD| sudo -S route add ${ROUTE5}\""
+   sshpass -e ssh -t -o StrictHostKeyChecking=no ubuntu@${OPSMAN_IP} "echo ${SSHPASS}| sudo -S ${ROUTE5}"
+ fi
+
+ if [ -z "${ROUTE6##*net*}" ]; then
+   echo "Running command: \"echo PASSWORD| sudo -S route add ${ROUTE6}\""
+   sshpass -e ssh -t -o StrictHostKeyChecking=no ubuntu@${OPSMAN_IP} "echo ${SSHPASS}| sudo -S ${ROUTE6}"
+ fi
 
  echo -e $CERT > /tmp/test.crt
  echo -e $KEY > /tmp/test.key
