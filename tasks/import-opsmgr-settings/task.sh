@@ -41,13 +41,13 @@ function main() {
  echo "Updating routes on opsman"
 
  echo "Setting  ${ROUTE1}"
- sshpass -e ssh -o StrictHostKeyChecking=no ubuntu@${OPSMAN_IP} ${ROUTE1}
+ sshpass -e ssh -t -o StrictHostKeyChecking=no ubuntu@${OPSMAN_IP} "echo '$SSHPASS'| sudo -S route add" ${ROUTE1}
  echo "Setting  ${ROUTE2}"
- sshpass -e ssh -o StrictHostKeyChecking=no ubuntu@${OPSMAN_IP} ${ROUTE2}
+ sshpass -e ssh -t -o StrictHostKeyChecking=no ubuntu@${OPSMAN_IP} "echo '$SSHPASS'| sudo -S route add"  ${ROUTE2}
  echo "Setting  ${ROUTE3}"
- sshpass -e ssh -o StrictHostKeyChecking=no ubuntu@${OPSMAN_IP} ${ROUTE3}
+ sshpass -e ssh -t -o StrictHostKeyChecking=no ubuntu@${OPSMAN_IP} "echo '$SSHPASS'| sudo -S route add"  ${ROUTE3}
  echo "Setting  ${ROUTE4}"
- sshpass -e ssh -o StrictHostKeyChecking=no ubuntu@${OPSMAN_IP} ${ROUTE4}
+ sshpass -e ssh -t -o StrictHostKeyChecking=no ubuntu@${OPSMAN_IP} "echo '$SSHPASS'| sudo -S route add"  ${ROUTE4}
 
  echo -e $CERT > /tmp/test.crt
  echo -e $KEY > /tmp/test.key
@@ -56,7 +56,7 @@ function main() {
 
  sshpass -e ssh -o StrictHostKeyChecking=no ubuntu@${OPSMAN_IP} sudo cp /var/tempest/cert/tempest.crt /var/tempest/cert/tempest.crt.old
  sshpass -e ssh -o StrictHostKeyChecking=no ubuntu@${OPSMAN_IP} sudo cp /var/tempest/cert/tempest.key /var/tempest/cert/tempest.key.old
- 
+
  sshpass -e scp -o StrictHostKeyChecking=no /tmp/test.key ubuntu@${OPSMAN_IP}:/home/ubuntu/tempest1.key
  sshpass -e scp -o StrictHostKeyChecking=no /tmp/test.crt ubuntu@${OPSMAN_IP}:/home/ubuntu/tempest1.crt
 
