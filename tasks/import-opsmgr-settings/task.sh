@@ -41,30 +41,29 @@ function main() {
  echo "Updating routes on opsman"
 
  echo "Setting  ${ROUTE1}"
- echo "Using Password ${SSHPASS}"
- echo "Running command: \"echo ${SSHPASS}| sudo -S route add ${ROUTE1}\""
+ echo "Running command: \"echo PASSWORD| sudo -S route add ${ROUTE1}\""
  sshpass -e ssh -t -o StrictHostKeyChecking=no ubuntu@${OPSMAN_IP} "echo ${SSHPASS}| sudo -S route add ${ROUTE1}"
- echo "Setting  ${ROUTE2}"
- sshpass -e ssh -t -o StrictHostKeyChecking=no ubuntu@${OPSMAN_IP} sudo route add ${ROUTE2}
- echo "Setting  ${ROUTE3}"
- sshpass -e ssh -t -o StrictHostKeyChecking=no ubuntu@${OPSMAN_IP} sudo route add ${ROUTE3}
- echo "Setting  ${ROUTE4}"
- sshpass -e ssh -t -o StrictHostKeyChecking=no ubuntu@${OPSMAN_IP} sudo route add ${ROUTE4}
+ echo "Running command: \"echo PASSWORD| sudo -S route add ${ROUTE2}\""
+ sshpass -e ssh -t -o StrictHostKeyChecking=no ubuntu@${OPSMAN_IP} "echo ${SSHPASS}| sudo -S route add ${ROUTE2}"
+ echo "Running command: \"echo PASSWORD| sudo -S route add ${ROUTE3}\""
+ sshpass -e ssh -t -o StrictHostKeyChecking=no ubuntu@${OPSMAN_IP} "echo ${SSHPASS}| sudo -S route add ${ROUTE3}"
+ echo "Running command: \"echo PASSWORD| sudo -S route add ${ROUTE4}\""
+ sshpass -e ssh -t -o StrictHostKeyChecking=no ubuntu@${OPSMAN_IP} "echo ${SSHPASS}| sudo -S route add ${ROUTE4}"
 
  echo -e $CERT > /tmp/test.crt
  echo -e $KEY > /tmp/test.key
  sed -i 's/^ //g' /tmp/test.key
  sed -i 's/^ //g' /tmp/test.crt
 
- sshpass -e ssh -o StrictHostKeyChecking=no ubuntu@${OPSMAN_IP} sudo cp /var/tempest/cert/tempest.crt /var/tempest/cert/tempest.crt.old
- sshpass -e ssh -o StrictHostKeyChecking=no ubuntu@${OPSMAN_IP} sudo cp /var/tempest/cert/tempest.key /var/tempest/cert/tempest.key.old
+ sshpass -e ssh -o StrictHostKeyChecking=no ubuntu@${OPSMAN_IP} "echo ${SSHPASS}| sudo -S cp /var/tempest/cert/tempest.crt /var/tempest/cert/tempest.crt.old"
+ sshpass -e ssh -o StrictHostKeyChecking=no ubuntu@${OPSMAN_IP} "echo ${SSHPASS}| sudo -s cp /var/tempest/cert/tempest.key /var/tempest/cert/tempest.key.old"
 
  sshpass -e scp -o StrictHostKeyChecking=no /tmp/test.key ubuntu@${OPSMAN_IP}:/home/ubuntu/tempest1.key
  sshpass -e scp -o StrictHostKeyChecking=no /tmp/test.crt ubuntu@${OPSMAN_IP}:/home/ubuntu/tempest1.crt
 
- sshpass -e ssh -o StrictHostKeyChecking=no ubuntu@${OPSMAN_IP} sudo mv /home/ubuntu/tempest1.key /var/tempest/cert/tempest.key
- sshpass -e ssh -o StrictHostKeyChecking=no ubuntu@${OPSMAN_IP} sudo mv /home/ubuntu/tempest1.crt /var/tempest/cert/tempest.crt
+ sshpass -e ssh -o StrictHostKeyChecking=no ubuntu@${OPSMAN_IP} "echo ${SSHPASS}| sudo -S mv /home/ubuntu/tempest1.key /var/tempest/cert/tempest.key"
+ sshpass -e ssh -o StrictHostKeyChecking=no ubuntu@${OPSMAN_IP} "echo ${SSHPASS}| sudo -S mv /home/ubuntu/tempest1.crt /var/tempest/cert/tempest.crt"
 
- sshpass -e ssh -o StrictHostKeyChecking=no ubuntu@${OPSMAN_IP} sudo service nginx restart
+ sshpass -e ssh -o StrictHostKeyChecking=no ubuntu@${OPSMAN_IP} "echo ${SSHPASS}| sudo -S service nginx restart"
 
  main "${PWD}"
