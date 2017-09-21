@@ -147,6 +147,8 @@ jobs:
       ROUTE2: {{route-2}}
       ROUTE3: {{route-3}}
       ROUTE4: {{route-4}}
+      ROUTE5: {{route-5}}
+      ROUTE6: {{route-6}}
       KEY: {{key}}
       CERT: {{cert}}
 
