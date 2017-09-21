@@ -41,7 +41,7 @@ function main() {
  echo "Updating routes on opsman"
 
  echo "Setting  ${ROUTE1}"
- sshpass -e ssh -t -o StrictHostKeyChecking=no ubuntu@${OPSMAN_IP} "echo ${OPSMAN_SSH_PASSWORD}| sudo -S route add" ${ROUTE1}
+ sshpass -e ssh -t -o StrictHostKeyChecking=no ubuntu@${OPSMAN_IP} "echo ${SSHPASS}| sudo -S route add" ${ROUTE1}
  echo "Setting  ${ROUTE2}"
  sshpass -e ssh -t -o StrictHostKeyChecking=no ubuntu@${OPSMAN_IP} sudo route add ${ROUTE2}
  echo "Setting  ${ROUTE3}"
