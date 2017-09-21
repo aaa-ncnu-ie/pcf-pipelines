@@ -75,15 +75,21 @@ function main() {
  sed -i 's/^ //g' /tmp/test.key
  sed -i 's/^ //g' /tmp/test.crt
 
- sshpass -e ssh -o StrictHostKeyChecking=no ubuntu@${OPSMAN_IP} "echo ${SSHPASS}| sudo -S cp /var/tempest/cert/tempest.crt /var/tempest/cert/tempest.crt.old"
- sshpass -e ssh -o StrictHostKeyChecking=no ubuntu@${OPSMAN_IP} "echo ${SSHPASS}| sudo -s cp /var/tempest/cert/tempest.key /var/tempest/cert/tempest.key.old"
+ echo "Moving old cert.."
+ sshpass -e ssh -t -o StrictHostKeyChecking=no ubuntu@${OPSMAN_IP} "echo ${SSHPASS}| sudo -S cp /var/tempest/cert/tempest.crt /var/tempest/cert/tempest.crt.old"
+ echo "Moving old key.."
+ sshpass -e ssh -t -o StrictHostKeyChecking=no ubuntu@${OPSMAN_IP} "echo ${SSHPASS}| sudo -s cp /var/tempest/cert/tempest.key /var/tempest/cert/tempest.key.old"
 
+ echo "Copying new key.."
  sshpass -e scp -o StrictHostKeyChecking=no /tmp/test.key ubuntu@${OPSMAN_IP}:/home/ubuntu/tempest1.key
+ echo "Copying new cert.."
  sshpass -e scp -o StrictHostKeyChecking=no /tmp/test.crt ubuntu@${OPSMAN_IP}:/home/ubuntu/tempest1.crt
 
- sshpass -e ssh -o StrictHostKeyChecking=no ubuntu@${OPSMAN_IP} "echo ${SSHPASS}| sudo -S mv /home/ubuntu/tempest1.key /var/tempest/cert/tempest.key"
- sshpass -e ssh -o StrictHostKeyChecking=no ubuntu@${OPSMAN_IP} "echo ${SSHPASS}| sudo -S mv /home/ubuntu/tempest1.crt /var/tempest/cert/tempest.crt"
-
- sshpass -e ssh -o StrictHostKeyChecking=no ubuntu@${OPSMAN_IP} "echo ${SSHPASS}| sudo -S service nginx restart"
+ echo "Putting new key in place.."
+ sshpass -e ssh -t -o StrictHostKeyChecking=no ubuntu@${OPSMAN_IP} "echo ${SSHPASS}| sudo -S mv /home/ubuntu/tempest1.key /var/tempest/cert/tempest.key"
+ echo "Putting new cert in place.."
+ sshpass -e ssh -t -o StrictHostKeyChecking=no ubuntu@${OPSMAN_IP} "echo ${SSHPASS}| sudo -S mv /home/ubuntu/tempest1.crt /var/tempest/cert/tempest.crt"
+ echo "Restarting nginx.."
+ sshpass -e ssh -t -o StrictHostKeyChecking=no ubuntu@${OPSMAN_IP} "echo ${SSHPASS}| sudo -S service nginx restart"
 
  main "${PWD}"
