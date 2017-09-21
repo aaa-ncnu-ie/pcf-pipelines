@@ -78,7 +78,7 @@ function main() {
  echo "Moving old cert.."
  sshpass -e ssh -t -o StrictHostKeyChecking=no ubuntu@${OPSMAN_IP} "echo ${SSHPASS}| sudo -S cp /var/tempest/cert/tempest.crt /var/tempest/cert/tempest.crt.old"
  echo "Moving old key.."
- sshpass -e ssh -t -o StrictHostKeyChecking=no ubuntu@${OPSMAN_IP} "echo ${SSHPASS}| sudo -s cp /var/tempest/cert/tempest.key /var/tempest/cert/tempest.key.old"
+ sshpass -e ssh -t -o StrictHostKeyChecking=no ubuntu@${OPSMAN_IP} "echo ${SSHPASS}| sudo -S cp /var/tempest/cert/tempest.key /var/tempest/cert/tempest.key.old"
 
  echo "Copying new key.."
  sshpass -e scp -o StrictHostKeyChecking=no /tmp/test.key ubuntu@${OPSMAN_IP}:/home/ubuntu/tempest1.key
