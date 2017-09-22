@@ -33,7 +33,7 @@ function main() {
      --password "${OPSMAN_PASSWORD}" \
      stage-product \
      --product-name "${PRODUCT_NAME}" \
-     --product-version "${version}.pivotal"
+     --product-version "${version}"
 }
 
 main "${PWD}"
