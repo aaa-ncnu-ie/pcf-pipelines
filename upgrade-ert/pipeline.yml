@@ -113,12 +113,12 @@ jobs:
       OPSMAN_USERNAME: {{opsman_admin_username}}
       OPSMAN_PASSWORD: {{opsman_admin_password}}
       OPSMAN_URI: {{opsman_uri}}
-      PRODUCT_NAME: cf
+      PRODUCT_NAME: cf-
 
   - task: upload-stemcell
     file: pcf-pipelines/tasks/upload-stemcell/task.yml
     params:
-      PRODUCT: cf
+      PRODUCT: cf-
       IAAS_TYPE: {{iaas_type}}
       OPSMAN_USERNAME: {{opsman_admin_username}}
       OPSMAN_PASSWORD: {{opsman_admin_password}}
