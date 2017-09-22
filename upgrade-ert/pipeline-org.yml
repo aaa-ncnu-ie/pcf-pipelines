@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# This pipeline is the same as upgrade-tile/pipeline.yml but with the tile
+# hardcoded to Elastic Runtime.
 groups: []
 
 resource_types:
@@ -36,12 +38,12 @@ resources:
     repository: om
     access_token: {{github_token}}
 
-- name: {{resource_name}}
+- name: elastic-runtime
   type: pivnet
   check_every: {{pivnet_poll_interval}}
   source:
     api_token: {{pivnet_token}}
-    product_slug: {{product_slug}}
+    product_slug: elastic-runtime
     product_version: {{product_version}}
     sort_by: semver
 
@@ -57,7 +59,7 @@ resources:
 - name: schedule
   type: time
   source:
-    interval: 30m
+    interval: 1m
     start: "12:00 AM"
     stop: "11:59 PM"
     location: America/Phoenix
@@ -68,20 +70,20 @@ jobs:
   plan:
   - get: schedule
     trigger: true
-  - get: {{resource_name}}
+  - get: elastic-runtime
     params: { globs: [] }
 
 - name: upgrade-tile
   plan:
   - aggregate:
-    - get: pcf-pipelines
     - get: pivnet-product
-      resource: {{resource_name}}
-      passed: [regulator]
+      resource: elastic-runtime
       trigger: true
+      passed: [regulator]
       params:
         globs:
         - "*pivotal"
+    - get: pcf-pipelines
     - get: tool-om
       params:
         globs:
@@ -103,7 +105,7 @@ jobs:
       OPSMAN_USERNAME: {{opsman_admin_username}}
       OPSMAN_PASSWORD: {{opsman_admin_password}}
       OPSMAN_URI: {{opsman_uri}}
-      PIVNET_PRODUCT_NAME: {{product_slug}}
+      PIVNET_PRODUCT_NAME: elastic-runtime
       TILE_UPLOAD_TIMEOUT: {{tile_upload_timeout}}
   - task: stage-tile
     file: pcf-pipelines/tasks/stage-product/task.yml
@@ -111,15 +113,17 @@ jobs:
       OPSMAN_USERNAME: {{opsman_admin_username}}
       OPSMAN_PASSWORD: {{opsman_admin_password}}
       OPSMAN_URI: {{opsman_uri}}
-      PRODUCT_NAME: {{product_name}}
+      PRODUCT_NAME: cf-
+
   - task: upload-stemcell
     file: pcf-pipelines/tasks/upload-stemcell/task.yml
     params:
-      PRODUCT: {{metadata_basename}}
+      PRODUCT: cf-
       IAAS_TYPE: {{iaas_type}}
       OPSMAN_USERNAME: {{opsman_admin_username}}
       OPSMAN_PASSWORD: {{opsman_admin_password}}
       OPSMAN_URI: {{opsman_uri}}
+
   - task: apply-changes
     file: pcf-pipelines/tasks/apply-changes/task.yml
     params:
