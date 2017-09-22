@@ -24,7 +24,7 @@ function main() {
 
   local version
   pushd "${cwd}/pivnet-product"
-    version="$(ls -1 *.pivotal | sed "s/"${PRODUCT_NAME}"-\(.*\).pivotal/\1/")"
+    version="$(ls -1 *.pivotal | sed "s/"${PRODUCT_NAME}"-\(.*\)-build.4.pivotal/\1/")"
   popd
 
   ./${CMD_PATH} --target "${OPSMAN_URI}" \
