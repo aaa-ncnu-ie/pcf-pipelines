@@ -24,12 +24,7 @@ function main() {
 
   local version
   pushd "${cwd}/pivnet-product"
-    if [ ${PRODUCT_NAME} = 'cf' ] #check for ERT product name due to verion name issue when returned as 1.11.11-build.4
-      then
-        version=${product_version}
-      else
-        version="$(ls -1 *.pivotal | sed "s/"${PRODUCT_NAME}"-\(.*\).pivotal/\1/")"
-      fi
+    version="$(ls -1 *.pivotal | sed "s/"${PRODUCT_NAME}"-\(.*\)-build.4.pivotal/\1/")"
   popd
 
   ./${CMD_PATH} --target "${OPSMAN_URI}" \
