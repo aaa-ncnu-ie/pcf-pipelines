@@ -305,10 +305,33 @@ jobs:
   plan:
   - aggregate:
     - get: pivnet-product
-      resource: {{mysql_resource_name}}
-    - get: pcf-pipelines
-      passed: [upgrade-jmx, upgrade-redis, upgrade-metrics, upgrade-mysql]
+      resource: {{redis_resource_name}}
+      passed: [upgrade-redis]
       trigger: true
+      params:
+        globs:
+        - "*pivotal"
+    - get: pivnet-product
+      resource: {{jmx_resource_name}}
+      passed: [upgrade-jmx]
+      trigger: true
+      params:
+        globs:
+        - "*pivotal"
+    - get: pivnet-product
+      resource: {{metrics_resource_name}}
+      passed: [upgrade-metrics]
+      trigger: true
+      params:
+        globs:
+        - "*pivotal"
+    - get: pivnet-product
+      resource: {{mysql_resource_name}}
+      passed: [upgrade-mysql]
+      trigger: true
+      params:
+        globs:
+        - "*pivotal"
     - get: tool-om
       params:
         globs:
