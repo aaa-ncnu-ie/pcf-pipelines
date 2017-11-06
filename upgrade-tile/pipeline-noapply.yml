@@ -1,0 +1,330 @@
+# Copyright 2017-Present Pivotal Software, Inc. All rights reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#  http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+groups: []
+
+resource_types:
+- name: pivnet
+  type: docker-image
+  source:
+    repository: pivotalcf/pivnet-resource
+    tag: latest-final
+
+resources:
+- name: pcf-pipelines
+  type: git
+  source:
+    uri: https://github.com/aaa-ncnu-ie/pcf-pipelines.git
+    branch: prod
+    username: {{github_token}}
+
+- name: tool-om
+  type: github-release
+  source:
+    user: pivotal-cf
+    repository: om
+    access_token: {{github_token}}
+
+- name: {{redis_resource_name}}
+  type: pivnet
+  check_every: {{pivnet_poll_interval}}
+  source:
+    api_token: {{pivnet_token}}
+    product_slug: {{redis_product_slug}}
+    product_version: {{redis_product_version}}
+    sort_by: semver
+
+- name: {{mysql_resource_name}}
+  type: pivnet
+  check_every: {{pivnet_poll_interval}}
+  source:
+    api_token: {{pivnet_token}}
+    product_slug: {{mysql_product_slug}}
+    product_version: {{mysql_product_version}}
+    sort_by: semver
+
+- name: {{metrics_resource_name}}
+  type: pivnet
+  check_every: {{pivnet_poll_interval}}
+  source:
+    api_token: {{pivnet_token}}
+    product_slug: {{metrics_product_slug}}
+    product_version: {{metrics_product_version}}
+    sort_by: semver
+
+- name: {{jmx_resource_name}}
+  type: pivnet
+  check_every: {{pivnet_poll_interval}}
+  source:
+    api_token: {{pivnet_token}}
+    product_slug: {{jmx_product_slug}}
+    product_version: {{jmx_product_version}}
+    sort_by: semver
+
+- name: stemcell-downloader
+  type: github-release
+  source:
+    user: pivotal-cf
+    repository: pcf-product-stemcell-downloader
+    access_token: {{github_token}}
+    globs:
+    - stemcell-downloader-linux
+
+- name: schedule
+  type: time
+  source:
+    interval: 24h
+    start: "9:00 PM"
+    stop: "9:15 PM"
+    location: America/Phoenix
+    days: [Sunday, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday]
+
+jobs:
+- name: regulator
+  plan:
+  - get: schedule
+    trigger: true
+  - get: {{redis_resource_name}}
+  - get: {{jmx_resource_name}}
+  - get: {{metrics_resource_name}}
+  - get: {{mysql_resource_name}}
+    params: { globs: [] }
+
+- name: upgrade-redis
+  plan:
+  - aggregate:
+    - get: pcf-pipelines
+    - get: pivnet-product
+      resource: {{redis_resource_name}}
+      passed: [regulator]
+      trigger: true
+      params:
+        globs:
+        - "*pivotal"
+    - get: tool-om
+      params:
+        globs:
+        - om-linux
+    - get: stemcell-downloader
+      params:
+        globs: [stemcell-downloader-linux]
+
+  - task: wait-opsman-clear
+    file: pcf-pipelines/tasks/wait-opsman-clear/task.yml
+    params:
+      OPSMAN_USERNAME: {{opsman_admin_username}}
+      OPSMAN_PASSWORD: {{opsman_admin_password}}
+      OPSMAN_URI: {{opsman_uri}}
+
+  - task: upload-tile
+    file: pcf-pipelines/tasks/upload-product/task.yml
+    params:
+      OPSMAN_USERNAME: {{opsman_admin_username}}
+      OPSMAN_PASSWORD: {{opsman_admin_password}}
+      OPSMAN_URI: {{opsman_uri}}
+      PIVNET_PRODUCT_NAME: {{redis_product_slug}}
+      TILE_UPLOAD_TIMEOUT: {{tile_upload_timeout}}
+  - task: stage-tile
+    file: pcf-pipelines/tasks/stage-product/task.yml
+    params:
+      OPSMAN_USERNAME: {{opsman_admin_username}}
+      OPSMAN_PASSWORD: {{opsman_admin_password}}
+      OPSMAN_URI: {{opsman_uri}}
+      PRODUCT_NAME: {{redis_product_name}}
+  - task: upload-stemcell
+    file: pcf-pipelines/tasks/upload-stemcell/task.yml
+    params:
+      PRODUCT: {{redis_metadata_basename}}
+      IAAS_TYPE: {{iaas_type}}
+      OPSMAN_USERNAME: {{opsman_admin_username}}
+      OPSMAN_PASSWORD: {{opsman_admin_password}}
+      OPSMAN_URI: {{opsman_uri}}
+
+- name: upgrade-jmx
+  plan:
+  - aggregate:
+    - get: pcf-pipelines
+    - get: pivnet-product
+      resource: {{jmx_resource_name}}
+      passed: [regulator]
+      trigger: true
+      params:
+        globs:
+        - "*pivotal"
+    - get: tool-om
+      params:
+        globs:
+        - om-linux
+    - get: stemcell-downloader
+      params:
+        globs: [stemcell-downloader-linux]
+
+  - task: wait-opsman-clear
+    file: pcf-pipelines/tasks/wait-opsman-clear/task.yml
+    params:
+      OPSMAN_USERNAME: {{opsman_admin_username}}
+      OPSMAN_PASSWORD: {{opsman_admin_password}}
+      OPSMAN_URI: {{opsman_uri}}
+
+  - task: upload-tile
+    file: pcf-pipelines/tasks/upload-product/task.yml
+    params:
+      OPSMAN_USERNAME: {{opsman_admin_username}}
+      OPSMAN_PASSWORD: {{opsman_admin_password}}
+      OPSMAN_URI: {{opsman_uri}}
+      PIVNET_PRODUCT_NAME: {{jmx_product_slug}}
+      TILE_UPLOAD_TIMEOUT: {{tile_upload_timeout}}
+  - task: stage-tile
+    file: pcf-pipelines/tasks/stage-product/task.yml
+    params:
+      OPSMAN_USERNAME: {{opsman_admin_username}}
+      OPSMAN_PASSWORD: {{opsman_admin_password}}
+      OPSMAN_URI: {{opsman_uri}}
+      PRODUCT_NAME: {{jmx_product_name}}
+  - task: upload-stemcell
+    file: pcf-pipelines/tasks/upload-stemcell/task.yml
+    params:
+      PRODUCT: {{jmx_metadata_basename}}
+      IAAS_TYPE: {{iaas_type}}
+      OPSMAN_USERNAME: {{opsman_admin_username}}
+      OPSMAN_PASSWORD: {{opsman_admin_password}}
+      OPSMAN_URI: {{opsman_uri}}
+
+- name: upgrade-metrics
+  plan:
+  - aggregate:
+    - get: pcf-pipelines
+    - get: pivnet-product
+      resource: {{metrics_resource_name}}
+      passed: [regulator]
+      trigger: true
+      params:
+        globs:
+        - "*pivotal"
+    - get: tool-om
+      params:
+        globs:
+        - om-linux
+    - get: stemcell-downloader
+      params:
+        globs: [stemcell-downloader-linux]
+
+  - task: wait-opsman-clear
+    file: pcf-pipelines/tasks/wait-opsman-clear/task.yml
+    params:
+      OPSMAN_USERNAME: {{opsman_admin_username}}
+      OPSMAN_PASSWORD: {{opsman_admin_password}}
+      OPSMAN_URI: {{opsman_uri}}
+
+  - task: upload-tile
+    file: pcf-pipelines/tasks/upload-product/task.yml
+    params:
+      OPSMAN_USERNAME: {{opsman_admin_username}}
+      OPSMAN_PASSWORD: {{opsman_admin_password}}
+      OPSMAN_URI: {{opsman_uri}}
+      PIVNET_PRODUCT_NAME: {{metrics_product_slug}}
+      TILE_UPLOAD_TIMEOUT: {{tile_upload_timeout}}
+  - task: stage-tile
+    file: pcf-pipelines/tasks/stage-product/task.yml
+    params:
+      OPSMAN_USERNAME: {{opsman_admin_username}}
+      OPSMAN_PASSWORD: {{opsman_admin_password}}
+      OPSMAN_URI: {{opsman_uri}}
+      PRODUCT_NAME: {{metrics_product_name}}
+  - task: upload-stemcell
+    file: pcf-pipelines/tasks/upload-stemcell/task.yml
+    params:
+      PRODUCT: {{metrics_metadata_basename}}
+      IAAS_TYPE: {{iaas_type}}
+      OPSMAN_USERNAME: {{opsman_admin_username}}
+      OPSMAN_PASSWORD: {{opsman_admin_password}}
+      OPSMAN_URI: {{opsman_uri}}
+
+- name: upgrade-mysql
+  plan:
+  - aggregate:
+    - get: pcf-pipelines
+    - get: pivnet-product
+      resource: {{mysql_resource_name}}
+      passed: [regulator]
+      trigger: true
+      params:
+        globs:
+        - "*pivotal"
+    - get: tool-om
+      params:
+        globs:
+        - om-linux
+    - get: stemcell-downloader
+      params:
+        globs: [stemcell-downloader-linux]
+
+  - task: wait-opsman-clear
+    file: pcf-pipelines/tasks/wait-opsman-clear/task.yml
+    params:
+      OPSMAN_USERNAME: {{opsman_admin_username}}
+      OPSMAN_PASSWORD: {{opsman_admin_password}}
+      OPSMAN_URI: {{opsman_uri}}
+
+  - task: upload-tile
+    file: pcf-pipelines/tasks/upload-product/task.yml
+    params:
+      OPSMAN_USERNAME: {{opsman_admin_username}}
+      OPSMAN_PASSWORD: {{opsman_admin_password}}
+      OPSMAN_URI: {{opsman_uri}}
+      PIVNET_PRODUCT_NAME: {{mysql_product_slug}}
+      TILE_UPLOAD_TIMEOUT: {{tile_upload_timeout}}
+  - task: stage-tile
+    file: pcf-pipelines/tasks/stage-product/task.yml
+    params:
+      OPSMAN_USERNAME: {{opsman_admin_username}}
+      OPSMAN_PASSWORD: {{opsman_admin_password}}
+      OPSMAN_URI: {{opsman_uri}}
+      PRODUCT_NAME: {{mysql_product_name}}
+  - task: upload-stemcell
+    file: pcf-pipelines/tasks/upload-stemcell/task.yml
+    params:
+      PRODUCT: {{mysql_metadata_basename}}
+      IAAS_TYPE: {{iaas_type}}
+      OPSMAN_USERNAME: {{opsman_admin_username}}
+      OPSMAN_PASSWORD: {{opsman_admin_password}}
+      OPSMAN_URI: {{opsman_uri}}
+
+- name: apply-changes-now
+  plan:
+  - aggregate:
+    - get: pivnet-product
+      resource: {{mysql_resource_name}}
+    - get: pcf-pipelines
+      passed: [upgrade-jmx, upgrade-redis, upgrade-metrics, upgrade-mysql]
+      trigger: true
+    - get: tool-om
+      params:
+        globs:
+        - om-linux
+
+  - task: wait-opsman-clear
+    file: pcf-pipelines/tasks/wait-opsman-clear/task.yml
+    params:
+      OPSMAN_USERNAME: {{opsman_admin_username}}
+      OPSMAN_PASSWORD: {{opsman_admin_password}}
+      OPSMAN_URI: {{opsman_uri}}
+
+  - task: apply-changes
+    file: pcf-pipelines/tasks/apply-changes/task.yml
+    params:
+      OPSMAN_USERNAME: {{opsman_admin_username}}
+      OPSMAN_PASSWORD: {{opsman_admin_password}}
+      OPSMAN_URI: {{opsman_uri}}
+      OPSMAN_TIMEOUT: {{opsman_timeout_seconds}}
