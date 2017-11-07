@@ -332,6 +332,8 @@ jobs:
       params:
         globs:
         - "*pivotal"
+    - get: pcf-pipelines
+      trigger: false
     - get: tool-om
       params:
         globs:
