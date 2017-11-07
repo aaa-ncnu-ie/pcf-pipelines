@@ -60,7 +60,7 @@ jobs:
         url: {{zapier-webhook}}
         pcf_env_backup: {{pcf_env}}
         backup_product: OpsManager
-        passfail: success
+        passfail: SUCCESS
         deadman: {{deadman-ops-man}}
     on_failure:
       task: success-zapier-notification
@@ -69,7 +69,7 @@ jobs:
         url: {{zapier-webhook}}
         pcf_env_backup: {{pcf_env}}
         backup_product: OpsManager
-        passfail: failure
+        passfail: FAILURE
         deadman: {{deadman-ops-man}}
 
 - name: backup-elastic-runtime
@@ -106,7 +106,7 @@ jobs:
         url: {{zapier-webhook}}
         pcf_env_backup: {{pcf_env}}
         backup_product: elastic-runtime
-        passfail: success
+        passfail: SUCCESS
         deadman: {{deadman-ert}}
     on_failure:
       task: success-zapier-notification
@@ -115,7 +115,7 @@ jobs:
         url: {{zapier-webhook}}
         pcf_env_backup: {{pcf_env}}
         backup_product: elastic-runtime
-        passfail: failure
+        passfail: FAILURE
         deadman: {{deadman-ert}}
 
 - name: backup-mysql
@@ -152,7 +152,7 @@ jobs:
         url: {{zapier-webhook}}
         pcf_env_backup: {{pcf_env}}
         backup_product: mysql-tile
-        passfail: success
+        passfail: SUCCESS
         deadman: {{deadman-mysql}}
     on_failure:
       task: success-zapier-notification
@@ -161,7 +161,7 @@ jobs:
         url: {{zapier-webhook}}
         pcf_env_backup: {{pcf_env}}
         backup_product: mysql-tile
-        passfail: failure
+        passfail: FAILURE
         deadman: {{deadman-mysql}}
 
 # name: backup-redis
