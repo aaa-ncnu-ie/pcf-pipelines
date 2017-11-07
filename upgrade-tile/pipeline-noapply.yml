@@ -304,28 +304,28 @@ jobs:
 - name: apply-changes-now
   plan:
   - aggregate:
-    - get: pivnet-product
+    - get: pivnet-product-redis
       resource: {{redis_resource_name}}
       passed: [upgrade-redis]
       trigger: true
       params:
         globs:
         - "*pivotal"
-    - get: pivnet-product
+    - get: pivnet-product-jmx
       resource: {{jmx_resource_name}}
       passed: [upgrade-jmx]
       trigger: true
       params:
         globs:
         - "*pivotal"
-    - get: pivnet-product
+    - get: pivnet-product-metrics
       resource: {{metrics_resource_name}}
       passed: [upgrade-metrics]
       trigger: true
       params:
         globs:
         - "*pivotal"
-    - get: pivnet-product
+    - get: pivnet-product-mysql
       resource: {{mysql_resource_name}}
       passed: [upgrade-mysql]
       trigger: true
