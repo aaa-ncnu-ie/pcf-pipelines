@@ -140,12 +140,12 @@ jobs:
       params:
         globs: [stemcell-downloader-linux]
 
-  - task: wait-opsman-clear
-    file: pcf-pipelines/tasks/wait-opsman-clear/task.yml
-    params:
-      OPSMAN_USERNAME: {{opsman_admin_username}}
-      OPSMAN_PASSWORD: {{opsman_admin_password}}
-      OPSMAN_URI: {{opsman_uri}}
+#  - task: wait-opsman-clear
+#    file: pcf-pipelines/tasks/wait-opsman-clear/task.yml
+#    params:
+#      OPSMAN_USERNAME: {{opsman_admin_username}}
+#      OPSMAN_PASSWORD: {{opsman_admin_password}}
+#      OPSMAN_URI: {{opsman_uri}}
 
   - task: upload-tile
     file: pcf-pipelines/tasks/upload-product/task.yml
@@ -190,12 +190,12 @@ jobs:
       params:
         globs: [stemcell-downloader-linux]
 
-  - task: wait-opsman-clear
-    file: pcf-pipelines/tasks/wait-opsman-clear/task.yml
-    params:
-      OPSMAN_USERNAME: {{opsman_admin_username}}
-      OPSMAN_PASSWORD: {{opsman_admin_password}}
-      OPSMAN_URI: {{opsman_uri}}
+#  - task: wait-opsman-clear
+#    file: pcf-pipelines/tasks/wait-opsman-clear/task.yml
+#    params:
+#      OPSMAN_USERNAME: {{opsman_admin_username}}
+#      OPSMAN_PASSWORD: {{opsman_admin_password}}
+#      OPSMAN_URI: {{opsman_uri}}
 
   - task: upload-tile
     file: pcf-pipelines/tasks/upload-product/task.yml
@@ -240,12 +240,12 @@ jobs:
       params:
         globs: [stemcell-downloader-linux]
 
-  - task: wait-opsman-clear
-    file: pcf-pipelines/tasks/wait-opsman-clear/task.yml
-    params:
-      OPSMAN_USERNAME: {{opsman_admin_username}}
-      OPSMAN_PASSWORD: {{opsman_admin_password}}
-      OPSMAN_URI: {{opsman_uri}}
+#  - task: wait-opsman-clear
+#    file: pcf-pipelines/tasks/wait-opsman-clear/task.yml
+#    params:
+#      OPSMAN_USERNAME: {{opsman_admin_username}}
+#      OPSMAN_PASSWORD: {{opsman_admin_password}}
+#      OPSMAN_URI: {{opsman_uri}}
 
   - task: upload-tile
     file: pcf-pipelines/tasks/upload-product/task.yml
@@ -290,12 +290,12 @@ jobs:
       params:
         globs: [stemcell-downloader-linux]
 
-  - task: wait-opsman-clear
-    file: pcf-pipelines/tasks/wait-opsman-clear/task.yml
-    params:
-      OPSMAN_USERNAME: {{opsman_admin_username}}
-      OPSMAN_PASSWORD: {{opsman_admin_password}}
-      OPSMAN_URI: {{opsman_uri}}
+#  - task: wait-opsman-clear
+#    file: pcf-pipelines/tasks/wait-opsman-clear/task.yml
+#    params:
+#      OPSMAN_USERNAME: {{opsman_admin_username}}
+#      OPSMAN_PASSWORD: {{opsman_admin_password}}
+#      OPSMAN_URI: {{opsman_uri}}
 
   - task: upload-tile
     file: pcf-pipelines/tasks/upload-product/task.yml
@@ -362,6 +362,7 @@ jobs:
       OPSMAN_PASSWORD: {{opsman_admin_password}}
       OPSMAN_URI: {{opsman_uri}}
       PRODUCT_NAME: {{sso_product_name}}
+      PRODUCT_VERSION: 1.4.6
   - task: upload-stemcell
     file: pcf-pipelines/tasks/upload-stemcell/task.yml
     params:
@@ -390,12 +391,12 @@ jobs:
       params:
         globs: [stemcell-downloader-linux]
 
-  - task: wait-opsman-clear
-    file: pcf-pipelines/tasks/wait-opsman-clear/task.yml
-    params:
-      OPSMAN_USERNAME: {{opsman_admin_username}}
-      OPSMAN_PASSWORD: {{opsman_admin_password}}
-      OPSMAN_URI: {{opsman_uri}}
+#  - task: wait-opsman-clear
+#    file: pcf-pipelines/tasks/wait-opsman-clear/task.yml
+#    params:
+#      OPSMAN_USERNAME: {{opsman_admin_username}}
+#      OPSMAN_PASSWORD: {{opsman_admin_password}}
+#      OPSMAN_URI: {{opsman_uri}}
 
   - task: upload-tile
     file: pcf-pipelines/tasks/upload-product/task.yml
@@ -473,12 +474,12 @@ jobs:
         globs:
         - om-linux
 
-  - task: wait-opsman-clear
-    file: pcf-pipelines/tasks/wait-opsman-clear/task.yml
-    params:
-      OPSMAN_USERNAME: {{opsman_admin_username}}
-      OPSMAN_PASSWORD: {{opsman_admin_password}}
-      OPSMAN_URI: {{opsman_uri}}
+#  - task: wait-opsman-clear
+#    file: pcf-pipelines/tasks/wait-opsman-clear/task.yml
+#    params:
+#      OPSMAN_USERNAME: {{opsman_admin_username}}
+#      OPSMAN_PASSWORD: {{opsman_admin_password}}
+#      OPSMAN_URI: {{opsman_uri}}
 
   - task: apply-changes
     file: pcf-pipelines/tasks/apply-changes/task.yml
