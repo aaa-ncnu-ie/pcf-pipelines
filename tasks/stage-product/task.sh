@@ -27,7 +27,7 @@ function main() {
     if [ ${PRODUCT_NAME} = 'cf' ] #check for ERT product name due to verion name issue when returned as 1.11.11-build.4
       then
         version=${PRODUCT_VERSION} #updated variable
-      elif [ ${PRODUCT_NAME} = 'Pivotal_Single_Sign-On_Service']
+      elif [ ${PRODUCT_NAME} = 'Pivotal_Single_Sign-On_Service' ]
       then
         version=${PRODUCT_VERSION} #updated variable
       else
