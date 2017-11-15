@@ -104,8 +104,8 @@ resources:
   type: time
   source:
     interval: 24h
-    start: "11:00 AM"
-    stop: "11:15 AM"
+    start: "9:00 AM"
+    stop: "9:15 AM"
     location: America/Phoenix
     days: [Sunday, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday]
 
