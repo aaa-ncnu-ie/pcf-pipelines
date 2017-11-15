@@ -368,13 +368,13 @@ jobs:
       params:
         globs:
         - "*pivotal"
-    - get: pivnet-product-sso
-      resource: {{sso_resource_name}}
-      passed: [upgrade-sso]
-      trigger: true
-      params:
-        globs:
-        - "*pivotal"
+    #- get: pivnet-product-sso
+    #  resource: {{sso_resource_name}}
+    #  passed: [upgrade-sso]
+    #  trigger: true
+    #  params:
+    #    globs:
+    #    - "*pivotal"
     - get: pivnet-product-cc
       resource: {{cc_resource_name}}
       passed: [upgrade-cc]
