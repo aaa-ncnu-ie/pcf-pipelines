@@ -29,7 +29,7 @@ function main() {
         version=${PRODUCT_VERSION} #updated variable
       elif [ ${PRODUCT_NAME} = 'Pivotal_Single_Sign-On_Service' ]
       then
-        version=${PRODUCT_VERSION} #updated variable
+        version="$(ls -1 *.pivotal | sed "s/"${PRODUCT_NAME}"_\(.*\).pivotal/\1/")"
       else
         version="$(ls -1 *.pivotal | sed "s/"${PRODUCT_NAME}"-\(.*\).pivotal/\1/")"
       fi
