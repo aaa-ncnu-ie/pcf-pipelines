@@ -26,7 +26,7 @@ function main() {
   pushd "${cwd}/pivnet-product"
     if [ ${PRODUCT_NAME} = 'cf' ] #check for ERT product name due to verion name issue when returned as 1.11.11-build.4
       then
-        version="$(ls -1 *.pivotal | sed "s/"${PRODUCT_NAME}"-\(.*\).pivotal/\1/")" #updated variable
+        version="$(ls -1 *.pivotal | sed "s/"${PRODUCT_NAME}"-\(.*\).pivotal/\1/" | sed "s/\(.*\)-build\(.*\)/\1/")" #updated variable
       elif [ ${PRODUCT_NAME} = 'Pivotal_Single_Sign-On_Service' ]
       then
         version="$(ls -1 *.pivotal | sed "s/"${PRODUCT_NAME}"_\(.*\).pivotal/\1/")"
