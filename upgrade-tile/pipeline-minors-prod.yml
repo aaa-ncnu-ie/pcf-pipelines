@@ -36,6 +36,15 @@ resources:
     repository: om
     access_token: {{github_token}}
 
+- name: {{ert_resource_name}}
+  type: pivnet
+  check_every: {{pivnet_poll_interval}}
+  source:
+    api_token: {{pivnet_token}}
+    product_slug: {{ert_product_slug}}
+    product_version: {{ert_product_version}}
+    sort_by: semver
+
 - name: {{redis_resource_name}}
   type: pivnet
   check_every: {{pivnet_poll_interval}}
@@ -100,20 +109,21 @@ resources:
     globs:
     - stemcell-downloader-linux
 
-- name: schedule
-  type: time
-  source:
-    interval: 24h
-    start: "9:00 AM"
-    stop: "9:15 AM"
-    location: America/Phoenix
-    days: [Sunday, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday]
+# - name: schedule
+#   type: time
+#   source:
+#     interval: 24h
+#     start: "9:00 AM"
+#     stop: "9:15 AM"
+#     location: America/Phoenix
+#     days: [Sunday, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday]
 
 jobs:
 - name: regulator
   plan:
-  - get: schedule
-    trigger: true
+  #- get: schedule
+  #  trigger: true
+  - get: {{ert_resource_name}}
   - get: {{redis_resource_name}}
   - get: {{jmx_resource_name}}
   - get: {{metrics_resource_name}}
@@ -121,6 +131,57 @@ jobs:
 #  - get: {{sso_resource_name}}
   - get: {{cc_resource_name}}
     params: { globs: [] }
+
+- name: upgrade-ert
+  plan:
+  - aggregate:
+    - get: pcf-pipelines
+    - get: pivnet-product
+      resource: {{ert_resource_name}}
+      passed: [regulator]
+      trigger: true
+      params:
+        globs:
+        - "*pivotal"
+    - get: tool-om
+      params:
+        globs:
+        - om-linux
+    - get: stemcell-downloader
+      params:
+        globs: [stemcell-downloader-linux]
+
+#  - task: wait-opsman-clear
+#    file: pcf-pipelines/tasks/wait-opsman-clear/task.yml
+#    params:
+#      OPSMAN_USERNAME: {{opsman_admin_username}}
+#      OPSMAN_PASSWORD: {{opsman_admin_password}}
+#      OPSMAN_URI: {{opsman_uri}}
+
+  - task: upload-tile
+    file: pcf-pipelines/tasks/upload-product/task.yml
+    params:
+      OPSMAN_USERNAME: {{opsman_admin_username}}
+      OPSMAN_PASSWORD: {{opsman_admin_password}}
+      OPSMAN_URI: {{opsman_uri}}
+      PIVNET_PRODUCT_NAME: {{ert_product_slug}}
+      TILE_UPLOAD_TIMEOUT: {{tile_upload_timeout}}
+  - task: stage-tile
+    file: pcf-pipelines/tasks/stage-product/task.yml
+    params:
+      OPSMAN_USERNAME: {{opsman_admin_username}}
+      OPSMAN_PASSWORD: {{opsman_admin_password}}
+      OPSMAN_URI: {{opsman_uri}}
+      PRODUCT_NAME: {{ert_product_name}}
+  - task: upload-stemcell
+    file: pcf-pipelines/tasks/upload-stemcell/task.yml
+    params:
+      PRODUCT: {{ert_metadata_basename}}
+      IAAS_TYPE: {{iaas_type}}
+      OPSMAN_USERNAME: {{opsman_admin_username}}
+      OPSMAN_PASSWORD: {{opsman_admin_password}}
+      OPSMAN_URI: {{opsman_uri}}
+
 
 - name: upgrade-redis
   plan:
@@ -140,6 +201,13 @@ jobs:
     - get: stemcell-downloader
       params:
         globs: [stemcell-downloader-linux]
+
+#  - task: wait-opsman-clear
+#    file: pcf-pipelines/tasks/wait-opsman-clear/task.yml
+#    params:
+#      OPSMAN_USERNAME: {{opsman_admin_username}}
+#      OPSMAN_PASSWORD: {{opsman_admin_password}}
+#      OPSMAN_URI: {{opsman_uri}}
 
   - task: upload-tile
     file: pcf-pipelines/tasks/upload-product/task.yml
@@ -184,6 +252,13 @@ jobs:
       params:
         globs: [stemcell-downloader-linux]
 
+#  - task: wait-opsman-clear
+#    file: pcf-pipelines/tasks/wait-opsman-clear/task.yml
+#    params:
+#      OPSMAN_USERNAME: {{opsman_admin_username}}
+#      OPSMAN_PASSWORD: {{opsman_admin_password}}
+#      OPSMAN_URI: {{opsman_uri}}
+
   - task: upload-tile
     file: pcf-pipelines/tasks/upload-product/task.yml
     params:
@@ -226,6 +301,13 @@ jobs:
     - get: stemcell-downloader
       params:
         globs: [stemcell-downloader-linux]
+
+#  - task: wait-opsman-clear
+#    file: pcf-pipelines/tasks/wait-opsman-clear/task.yml
+#    params:
+#      OPSMAN_USERNAME: {{opsman_admin_username}}
+#      OPSMAN_PASSWORD: {{opsman_admin_password}}
+#      OPSMAN_URI: {{opsman_uri}}
 
   - task: upload-tile
     file: pcf-pipelines/tasks/upload-product/task.yml
@@ -270,6 +352,13 @@ jobs:
       params:
         globs: [stemcell-downloader-linux]
 
+#  - task: wait-opsman-clear
+#    file: pcf-pipelines/tasks/wait-opsman-clear/task.yml
+#    params:
+#      OPSMAN_USERNAME: {{opsman_admin_username}}
+#      OPSMAN_PASSWORD: {{opsman_admin_password}}
+#      OPSMAN_URI: {{opsman_uri}}
+
   - task: upload-tile
     file: pcf-pipelines/tasks/upload-product/task.yml
     params:
@@ -294,6 +383,58 @@ jobs:
       OPSMAN_PASSWORD: {{opsman_admin_password}}
       OPSMAN_URI: {{opsman_uri}}
 
+# Not in Pord Yet
+# - name: upgrade-sso
+#   plan:
+#   - aggregate:
+#     - get: pcf-pipelines
+#     - get: pivnet-product
+#       resource: {{sso_resource_name}}
+#       passed: [regulator]
+#       trigger: true
+#       params:
+#         globs:
+#         - "*pivotal"
+#     - get: tool-om
+#       params:
+#         globs:
+#         - om-linux
+#     - get: stemcell-downloader
+#       params:
+#         globs: [stemcell-downloader-linux]
+
+#   - task: wait-opsman-clear
+#     file: pcf-pipelines/tasks/wait-opsman-clear/task.yml
+#     params:
+#       OPSMAN_USERNAME: {{opsman_admin_username}}
+#       OPSMAN_PASSWORD: {{opsman_admin_password}}
+#       OPSMAN_URI: {{opsman_uri}}
+
+#  - task: upload-tile
+#    file: pcf-pipelines/tasks/upload-product/task.yml
+#    params:
+#      OPSMAN_USERNAME: {{opsman_admin_username}}
+#      OPSMAN_PASSWORD: {{opsman_admin_password}}
+#      OPSMAN_URI: {{opsman_uri}}
+#      PIVNET_PRODUCT_NAME: {{sso_product_slug}}
+#      TILE_UPLOAD_TIMEOUT: {{tile_upload_timeout}}
+#  - task: stage-tile
+#    file: pcf-pipelines/tasks/stage-product/task.yml
+#    params:
+#      OPSMAN_USERNAME: {{opsman_admin_username}}
+#      OPSMAN_PASSWORD: {{opsman_admin_password}}
+#      OPSMAN_URI: {{opsman_uri}}
+#      PRODUCT_NAME: {{sso_product_name}}
+#      PRODUCT_VERSION: 1.4.6
+#  - task: upload-stemcell
+#    file: pcf-pipelines/tasks/upload-stemcell/task.yml
+#    params:
+#      PRODUCT: {{sso_metadata_basename}}
+#      IAAS_TYPE: {{iaas_type}}
+#      OPSMAN_USERNAME: {{opsman_admin_username}}
+#      OPSMAN_PASSWORD: {{opsman_admin_password}}
+#      OPSMAN_URI: {{opsman_uri}}
+
 - name: upgrade-cc
   plan:
   - aggregate:
@@ -312,6 +453,13 @@ jobs:
     - get: stemcell-downloader
       params:
         globs: [stemcell-downloader-linux]
+
+#  - task: wait-opsman-clear
+#    file: pcf-pipelines/tasks/wait-opsman-clear/task.yml
+#    params:
+#      OPSMAN_USERNAME: {{opsman_admin_username}}
+#      OPSMAN_PASSWORD: {{opsman_admin_password}}
+#      OPSMAN_URI: {{opsman_uri}}
 
   - task: upload-tile
     file: pcf-pipelines/tasks/upload-product/task.yml
@@ -340,6 +488,13 @@ jobs:
 - name: apply-changes-now
   plan:
   - aggregate:
+    - get: pivnet-product-ert
+      resource: {{ert_resource_name}}
+      passed: [upgrade-ert]
+      trigger: true
+      params:
+        globs:
+        - "*pivotal"
     - get: pivnet-product-redis
       resource: {{redis_resource_name}}
       passed: [upgrade-redis]
@@ -368,6 +523,7 @@ jobs:
       params:
         globs:
         - "*pivotal"
+    # Not In Prod Yet
     #- get: pivnet-product-sso
     #  resource: {{sso_resource_name}}
     #  passed: [upgrade-sso]
@@ -388,6 +544,13 @@ jobs:
       params:
         globs:
         - om-linux
+
+#  - task: wait-opsman-clear
+#    file: pcf-pipelines/tasks/wait-opsman-clear/task.yml
+#    params:
+#      OPSMAN_USERNAME: {{opsman_admin_username}}
+#      OPSMAN_PASSWORD: {{opsman_admin_password}}
+#      OPSMAN_URI: {{opsman_uri}}
 
   - task: apply-changes
     file: pcf-pipelines/tasks/apply-changes/task.yml

@@ -36,6 +36,15 @@ resources:
     repository: om
     access_token: {{github_token}}
 
+- name: {{ert_resource_name}}
+  type: pivnet
+  check_every: {{pivnet_poll_interval}}
+  source:
+    api_token: {{pivnet_token}}
+    product_slug: {{ert_product_slug}}
+    product_version: {{ert_product_version}}
+    sort_by: semver
+
 - name: {{redis_resource_name}}
   type: pivnet
   check_every: {{pivnet_poll_interval}}
