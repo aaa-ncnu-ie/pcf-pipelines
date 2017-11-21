@@ -24,8 +24,7 @@ function main() {
 
   local version
   pushd "${cwd}/pivnet-product"
-    #if
-    #[ ${PRODUCT_NAME} = 'cf' ] #check for ERT product name due to verion name issue when returned as 1.11.11-build.4
+    # if [ ${PRODUCT_NAME} = 'cf' ] #check for ERT product name due to verion name issue when returned as 1.11.11-build.4
     #  then
     #    version="$(ls -1 *.pivotal | sed "s/"${PRODUCT_NAME}"-\(.*\).pivotal/\1/" | sed "s/\(.*\)-build\(.*\)/\1/")" #updated variable
     #  elif
