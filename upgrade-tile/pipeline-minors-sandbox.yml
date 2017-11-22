@@ -108,20 +108,20 @@ resources:
     globs:
     - stemcell-downloader-linux
 
-# - name: schedule
-#   type: time
-#   source:
-#     interval: 24h
-#     start: "11:00 AM"
-#     stop: "11:15 AM"
-#     location: America/Phoenix
-#     days: [Sunday, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday]
+- name: schedule
+  type: time
+  source:
+    interval: 24h
+    start: "11:00 AM"
+    stop: "11:15 AM"
+    location: America/Phoenix
+    days: [Sunday, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday]
 
 jobs:
 - name: regulator
   plan:
-  #- get: schedule
-  #  trigger: true
+  - get: schedule
+    trigger: true
   - get: {{ert_resource_name}}
   - get: {{redis_resource_name}}
   - get: {{jmx_resource_name}}
