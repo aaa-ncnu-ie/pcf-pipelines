@@ -20,6 +20,7 @@ resources:
   source:
     start: 8:00 AM
     stop: 11:59 PM
+    location: America/Phoenix
 - name: pcf-pipelines-resource
   type: git
   source:
