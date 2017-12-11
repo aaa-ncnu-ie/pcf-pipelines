@@ -19,7 +19,7 @@ resources:
   type: time
   source:
     start: 12:00 PM #UTC time = 5am Phoenix
-    stop: 13:00 PM  #UTC time = 6am Phoenix
+    stop: 12:05 PM  #UTC time = 5:05am Phoenix
 - name: pcf-pipelines-resource
   type: git
   source:
