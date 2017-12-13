@@ -116,7 +116,7 @@ resources:
     start: "1:00 AM"
     stop: "1:15 AM"
     location: America/Phoenix
-    days: [Wednesday]
+    days: [Wednesday, Thursday]
 
 jobs:
 - name: regulator
@@ -435,24 +435,24 @@ jobs:
 #      OPSMAN_PASSWORD: {{opsman_admin_password}}
 #      OPSMAN_URI: {{opsman_uri}}
 
-- name: upgrade-cc
-  plan:
-  - aggregate:
-    - get: pcf-pipelines
-    - get: pivnet-product
-      resource: {{cc_resource_name}}
-      passed: [regulator]
-      trigger: true
-      params:
-        globs:
-        - "*pivotal"
-    - get: tool-om
-      params:
-        globs:
-        - om-linux
-    - get: stemcell-downloader
-      params:
-        globs: [stemcell-downloader-linux]
+# name: upgrade-cc
+# plan:
+# - aggregate:
+#   - get: pcf-pipelines
+#   - get: pivnet-product
+#     resource: {{cc_resource_name}}
+#     passed: [regulator]
+#     trigger: true
+#     params:
+#       globs:
+#       - "*pivotal"
+#   - get: tool-om
+#     params:
+#       globs:
+#       - om-linux
+#   - get: stemcell-downloader
+#     params:
+#       globs: [stemcell-downloader-linux]
 
 #  - task: wait-opsman-clear
 #    file: pcf-pipelines/tasks/wait-opsman-clear/task.yml
