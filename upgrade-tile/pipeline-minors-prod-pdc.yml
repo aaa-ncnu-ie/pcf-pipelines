@@ -91,14 +91,15 @@ resources:
     product_version: {{jmx_product_version}}
     sort_by: semver
 
-- name: {{cc_resource_name}}
-  type: pivnet
-  check_every: {{pivnet_poll_interval}}
-  source:
-    api_token: {{pivnet_token}}
-    product_slug: {{cc_product_slug}}
-    product_version: {{cc_product_version}}
-    sort_by: semver
+# Not in Prod Yet
+#  - name: {{cc_resource_name}}
+#    type: pivnet
+#    check_every: {{pivnet_poll_interval}}
+#    source:
+#      api_token: {{pivnet_token}}
+#      product_slug: {{cc_product_slug}}
+#      product_version: {{cc_product_version}}
+#      sort_by: semver
 
 - name: stemcell-downloader
   type: github-release
@@ -129,7 +130,7 @@ jobs:
   - get: {{metrics_resource_name}}
   - get: {{mysql_resource_name}}
 #  - get: {{sso_resource_name}}
-  - get: {{cc_resource_name}}
+#  - get: {{cc_resource_name}}
     params: { globs: [] }
 
 - name: upgrade-ert
@@ -461,29 +462,29 @@ jobs:
 #      OPSMAN_PASSWORD: {{opsman_admin_password}}
 #      OPSMAN_URI: {{opsman_uri}}
 
-  - task: upload-tile
-    file: pcf-pipelines/tasks/upload-product/task.yml
-    params:
-      OPSMAN_USERNAME: {{opsman_admin_username}}
-      OPSMAN_PASSWORD: {{opsman_admin_password}}
-      OPSMAN_URI: {{opsman_uri}}
-      PIVNET_PRODUCT_NAME: {{cc_product_slug}}
-      TILE_UPLOAD_TIMEOUT: {{tile_upload_timeout}}
-  - task: stage-tile
-    file: pcf-pipelines/tasks/stage-product/task.yml
-    params:
-      OPSMAN_USERNAME: {{opsman_admin_username}}
-      OPSMAN_PASSWORD: {{opsman_admin_password}}
-      OPSMAN_URI: {{opsman_uri}}
-      PRODUCT_NAME: {{cc_product_name}}
-  - task: upload-stemcell
-    file: pcf-pipelines/tasks/upload-stemcell/task.yml
-    params:
-      PRODUCT: {{cc_metadata_basename}}
-      IAAS_TYPE: {{iaas_type}}
-      OPSMAN_USERNAME: {{opsman_admin_username}}
-      OPSMAN_PASSWORD: {{opsman_admin_password}}
-      OPSMAN_URI: {{opsman_uri}}
+#  - task: upload-tile
+#    file: pcf-pipelines/tasks/upload-product/task.yml
+#    params:
+#      OPSMAN_USERNAME: {{opsman_admin_username}}
+#      OPSMAN_PASSWORD: {{opsman_admin_password}}
+#      OPSMAN_URI: {{opsman_uri}}
+#      PIVNET_PRODUCT_NAME: {{cc_product_slug}}
+#      TILE_UPLOAD_TIMEOUT: {{tile_upload_timeout}}
+#  - task: stage-tile
+#    file: pcf-pipelines/tasks/stage-product/task.yml
+#    params:
+#      OPSMAN_USERNAME: {{opsman_admin_username}}
+#      OPSMAN_PASSWORD: {{opsman_admin_password}}
+#      OPSMAN_URI: {{opsman_uri}}
+#      PRODUCT_NAME: {{cc_product_name}}
+#  - task: upload-stemcell
+#    file: pcf-pipelines/tasks/upload-stemcell/task.yml
+#    params:
+#      PRODUCT: {{cc_metadata_basename}}
+#      IAAS_TYPE: {{iaas_type}}
+#      OPSMAN_USERNAME: {{opsman_admin_username}}
+#      OPSMAN_PASSWORD: {{opsman_admin_password}}
+#      OPSMAN_URI: {{opsman_uri}}
 
 - name: apply-changes-now
   plan:
@@ -531,19 +532,19 @@ jobs:
     #  params:
     #    globs:
     #    - "*pivotal"
-    - get: pivnet-product-cc
-      resource: {{cc_resource_name}}
-      passed: [upgrade-cc]
-      trigger: true
-      params:
-        globs:
-        - "*pivotal"
-    - get: pcf-pipelines
-      trigger: false
-    - get: tool-om
-      params:
-        globs:
-        - om-linux
+    #- get: pivnet-product-cc
+    #  resource: {{cc_resource_name}}
+    #  passed: [upgrade-cc]
+    #  trigger: true
+    #  params:
+    #    globs:
+    #    - "*pivotal"
+    #- get: pcf-pipelines
+    #  trigger: false
+    #- get: tool-om
+    #  params:
+    #    globs:
+    #    - om-linux
 
 #  - task: wait-opsman-clear
 #    file: pcf-pipelines/tasks/wait-opsman-clear/task.yml
