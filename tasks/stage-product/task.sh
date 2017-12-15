@@ -31,6 +31,9 @@ function main() {
       if [ ${PRODUCT_NAME} = 'Pivotal_Single_Sign-On_Service' ]
       then
         version="$(ls -1 *.pivotal | sed "s/"${PRODUCT_NAME}"_\(.*\).pivotal/\1/" | sed "s/\(.*\)-build\(.*\)/\1/")"
+      elif [ ${PRODUCT_NAME} = 'p-cloudcache' ]
+      then
+        version="$(ls -1 *.pivotal | sed "s/"${PRODUCT_NAME}"_\(.*\).pivotal/\1/" | sed "s/\(.*\).pivotal\(.*\)/\1/")"
       else
         version="$(ls -1 *.pivotal | sed "s/"${PRODUCT_NAME}"-\(.*\).pivotal/\1/" | sed "s/\(.*\)-build\(.*\)/\1/")" #updated variable
       #  version="$(ls -1 *.pivotal | sed "s/"${PRODUCT_NAME}"-\(.*\).pivotal/\1/")"
