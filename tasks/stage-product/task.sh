@@ -33,7 +33,7 @@ function main() {
         version="$(ls -1 *.pivotal | sed "s/"${PRODUCT_NAME}"_\(.*\).pivotal/\1/" | sed "s/\(.*\)-build\(.*\)/\1/")"
       elif [ ${PRODUCT_NAME} = 'p-cloudcache' ]
       then
-        version="$(ls -1 *.pivotal | sed "s/"${PRODUCT_NAME}"_\(.*\).pivotal/\1/")"
+        version="$(ls -1 *.pivotal | sed "s/"${PRODUCT_NAME}"-\(.*\).pivotal/\1/")"
       else
         version="$(ls -1 *.pivotal | sed "s/"${PRODUCT_NAME}"-\(.*\).pivotal/\1/" | sed "s/\(.*\)-build\(.*\)/\1/")" #updated variable
       #  version="$(ls -1 *.pivotal | sed "s/"${PRODUCT_NAME}"-\(.*\).pivotal/\1/")"
