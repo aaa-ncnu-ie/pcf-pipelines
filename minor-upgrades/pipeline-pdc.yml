@@ -123,10 +123,10 @@ resources:
   type: time
   source:
     interval: 24h
-    start: "11:00 AM"
-    stop: "11:05 AM"
+    start: "1:00 AM"
+    stop: "1:05 AM"
     location: America/Phoenix
-    days: [Monday, Wednesday, Thursday, Friday]
+    days: [Wednesday]
 
 jobs:
 - name: regulator
