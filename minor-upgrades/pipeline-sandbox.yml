@@ -108,28 +108,28 @@ resources:
     globs:
     - stemcell-downloader-linux
 
-- name: schedule
+- name: schedule {{scheduler-time-window-start}} to {{scheduler-time-window-stop}}
   type: time
   source:
-    interval: 24h
-    start: "12:00 AM"
-    stop: "12:15 AM"
-    location: America/Phoenix
+    interval: {{scheduler-time-interval}}
+    start: {{scheduler-time-window-start}}
+    stop: {{scheduler-time-window-stop}}
+    location: {{scheduler-time-location}}
     days: [Sunday, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday]
 
-- name: schedule-apply
+- name: schedule-apply-changes {{schedule-apply-changes-time-window-start}} to {{schedule-apply-changes-time-window-stop}}
   type: time
   source:
-    interval: 24h
-    start: "9:00 AM"
-    stop: "9:15 AM"
-    location: America/Phoenix
+    interval: {{schedule-apply-changes-time-interval}}
+    start: {{schedule-apply-changes-time-window-start}}
+    stop: {{schedule-apply-changes-time-window-stop}}
+    location: {{schedule-apply-changes-time-location}}
     days: [Sunday, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday]
 
 jobs:
 - name: regulator
   plan:
-  - get: schedule
+  - get: schedule {{scheduler-time-window-start}} to {{scheduler-time-window-stop}}
     trigger: true
   - get: {{ert_resource_name}}
   - get: {{redis_resource_name}}
@@ -437,62 +437,36 @@ jobs:
 
 - name: apply-changes-now
   plan:
+  - get: pcf-pipelines
+  - get: tool-om
+    params:
+      globs:
+      - om-linux
   - aggregate:
-    - get: pivnet-product-ert
-      resource: {{ert_resource_name}}
+    - get: schedule-apply-changes {{schedule-apply-changes-time-window-start}} to {{schedule-apply-changes-time-window-stop}}
+      trigger: true
+    - get: {{ert_resource_name}}
+      trigger: true
       passed: [upgrade-ert]
+    - get: {{redis_resource_name}}
       trigger: true
-      params:
-        globs:
-        - "*pivotal"
-    - get: pivnet-product-redis
-      resource: {{redis_resource_name}}
       passed: [upgrade-redis]
+    - get: {{jmx_resource_name}}
       trigger: true
-      params:
-        globs:
-        - "*pivotal"
-    - get: pivnet-product-jmx
-      resource: {{jmx_resource_name}}
       passed: [upgrade-jmx]
+    - get: {{metrics_resource_name}}
       trigger: true
-      params:
-        globs:
-        - "*pivotal"
-    - get: pivnet-product-metrics
-      resource: {{metrics_resource_name}}
       passed: [upgrade-metrics]
+    - get: {{mysql_resource_name}}
       trigger: true
-      params:
-        globs:
-        - "*pivotal"
-    - get: pivnet-product-mysql
-      resource: {{mysql_resource_name}}
       passed: [upgrade-mysql]
+    - get: {{sso_resource_name}}
       trigger: true
-      params:
-        globs:
-        - "*pivotal"
-    - get: pivnet-product-sso
-      resource: {{sso_resource_name}}
       passed: [upgrade-sso]
+    - get: {{cc_resource_name}}
       trigger: true
-      params:
-        globs:
-        - "*pivotal"
-    - get: pivnet-product-cc
-      resource: {{cc_resource_name}}
       passed: [upgrade-cc]
-      trigger: true
-      params:
-        globs:
-        - "*pivotal"
-    - get: pcf-pipelines
-      trigger: false
-    - get: tool-om
-      params:
-        globs:
-        - om-linux
+
   - task: apply-changes
     file: pcf-pipelines/tasks/apply-changes/task.yml
     params:

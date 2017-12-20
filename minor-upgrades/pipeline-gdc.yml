@@ -63,14 +63,14 @@ resources:
     product_version: {{mysql_product_version}}
     sort_by: semver
 
-#- name: {{sso_resource_name}}
-#  type: pivnet
-#  check_every: {{pivnet_poll_interval}}
-#  source:
-#    api_token: {{pivnet_token}}
-#    product_slug: {{sso_product_slug}}
-#    product_version: {{sso_product_version}}
-#    sort_by: semver
+- name: {{sso_resource_name}}
+  type: pivnet
+  check_every: {{pivnet_poll_interval}}
+  source:
+    api_token: {{pivnet_token}}
+    product_slug: {{sso_product_slug}}
+    product_version: {{sso_product_version}}
+    sort_by: semver
 
 - name: {{metrics_resource_name}}
   type: pivnet
@@ -108,35 +108,35 @@ resources:
     globs:
     - stemcell-downloader-linux
 
-- name: schedule
+- name: schedule {{scheduler-time-window-start}} to {{scheduler-time-window-stop}}
   type: time
   source:
-    interval: 24h
-    start: "9:00 AM"
-    stop: "9:15 AM"
-    location: America/Phoenix
+    interval: {{scheduler-time-interval}}
+    start: {{scheduler-time-window-start}}
+    stop: {{scheduler-time-window-stop}}
+    location: {{scheduler-time-location}}
     days: [Sunday, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday]
 
-- name: schedule-apply-changes
+- name: schedule-apply-changes {{schedule-apply-changes-time-window-start}} to {{schedule-apply-changes-time-window-stop}}
   type: time
   source:
-    interval: 24h
-    start: "11:00 AM"
-    stop: "11:05 AM"
-    location: America/Phoenix
+    interval: {{schedule-apply-changes-time-interval}}
+    start: {{schedule-apply-changes-time-window-start}}
+    stop: {{schedule-apply-changes-time-window-stop}}
+    location: {{schedule-apply-changes-time-location}}
     days: [Sunday, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday]
 
 jobs:
 - name: regulator
   plan:
-  - get: schedule
+  - get: schedule {{scheduler-time-window-start}} to {{scheduler-time-window-stop}}
     trigger: true
   - get: {{ert_resource_name}}
   - get: {{redis_resource_name}}
   - get: {{jmx_resource_name}}
   - get: {{metrics_resource_name}}
   - get: {{mysql_resource_name}}
-#  - get: {{sso_resource_name}}
+  - get: {{sso_resource_name}}
   - get: {{cc_resource_name}}
     params: { globs: [] }
 
@@ -350,48 +350,48 @@ jobs:
       OPSMAN_PASSWORD: {{opsman_admin_password}}
       OPSMAN_URI: {{opsman_uri}}
 
-#- name: upgrade-sso
-#  plan:
-#  - aggregate:
-#    - get: pcf-pipelines
-#    - get: pivnet-product
-#      resource: {{sso_resource_name}}
-#      passed: [regulator]
-#      trigger: true
-#      params:
-#        globs:
-#        - "*pivotal"
-#    - get: tool-om
-#      params:
-#        globs:
-#        - om-linux
-#    - get: stemcell-downloader
-#      params:
-#        globs: [stemcell-downloader-linux]
-#  - task: upload-tile
-#    file: pcf-pipelines/tasks/upload-product/task.yml
-#    params:
-#      OPSMAN_USERNAME: {{opsman_admin_username}}
-#      OPSMAN_PASSWORD: {{opsman_admin_password}}
-#      OPSMAN_URI: {{opsman_uri}}
-#      PIVNET_PRODUCT_NAME: {{sso_product_slug}}
-#      TILE_UPLOAD_TIMEOUT: {{tile_upload_timeout}}
-#  - task: stage-tile
-#    file: pcf-pipelines/tasks/stage-product/task.yml
-#    params:
-#      OPSMAN_USERNAME: {{opsman_admin_username}}
-#      OPSMAN_PASSWORD: {{opsman_admin_password}}
-#      OPSMAN_URI: {{opsman_uri}}
-#      PRODUCT_NAME: {{sso_product_name}}
-#      PRODUCT_VERSION: 1.4.6
-#  - task: upload-stemcell
-#    file: pcf-pipelines/tasks/upload-stemcell/task.yml
-#    params:
-#      PRODUCT: {{sso_metadata_basename}}
-#      IAAS_TYPE: {{iaas_type}}
-#      OPSMAN_USERNAME: {{opsman_admin_username}}
-#      OPSMAN_PASSWORD: {{opsman_admin_password}}
-#      OPSMAN_URI: {{opsman_uri}}
+- name: upgrade-sso
+  plan:
+  - aggregate:
+    - get: pcf-pipelines
+    - get: pivnet-product
+      resource: {{sso_resource_name}}
+      passed: [regulator]
+      trigger: true
+      params:
+        globs:
+        - "*pivotal"
+    - get: tool-om
+      params:
+        globs:
+        - om-linux
+    - get: stemcell-downloader
+      params:
+        globs: [stemcell-downloader-linux]
+  - task: upload-tile
+    file: pcf-pipelines/tasks/upload-product/task.yml
+    params:
+      OPSMAN_USERNAME: {{opsman_admin_username}}
+      OPSMAN_PASSWORD: {{opsman_admin_password}}
+      OPSMAN_URI: {{opsman_uri}}
+      PIVNET_PRODUCT_NAME: {{sso_product_slug}}
+      TILE_UPLOAD_TIMEOUT: {{tile_upload_timeout}}
+  - task: stage-tile
+    file: pcf-pipelines/tasks/stage-product/task.yml
+    params:
+      OPSMAN_USERNAME: {{opsman_admin_username}}
+      OPSMAN_PASSWORD: {{opsman_admin_password}}
+      OPSMAN_URI: {{opsman_uri}}
+      PRODUCT_NAME: {{sso_product_name}}
+      PRODUCT_VERSION: 1.4.6
+  - task: upload-stemcell
+    file: pcf-pipelines/tasks/upload-stemcell/task.yml
+    params:
+      PRODUCT: {{sso_metadata_basename}}
+      IAAS_TYPE: {{iaas_type}}
+      OPSMAN_USERNAME: {{opsman_admin_username}}
+      OPSMAN_PASSWORD: {{opsman_admin_password}}
+      OPSMAN_URI: {{opsman_uri}}
 
 - name: upgrade-cc
   plan:
@@ -443,7 +443,7 @@ jobs:
       globs:
       - om-linux
   - aggregate:
-    - get: schedule-apply-changes
+    - get: schedule-apply-changes {{schedule-apply-changes-time-window-start}} to {{schedule-apply-changes-time-window-stop}}
       trigger: true
     - get: {{ert_resource_name}}
       trigger: true
@@ -460,9 +460,9 @@ jobs:
     - get: {{mysql_resource_name}}
       trigger: true
       passed: [upgrade-mysql]
-  #  - get: {{sso_resource_name}}
-  #    trigger: true
-  #    passed: [upgrade-sso]
+    - get: {{sso_resource_name}}
+      trigger: true
+      passed: [upgrade-sso]
     - get: {{cc_resource_name}}
       trigger: true
       passed: [upgrade-cc]
