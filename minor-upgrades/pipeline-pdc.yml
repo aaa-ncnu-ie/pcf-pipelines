@@ -110,7 +110,7 @@ resources:
     globs:
     - stemcell-downloader-linux
 
-- name: schedule
+- name: schedule {{scheduler-time-window-start}} to {{scheduler-time-window-stop}}
   type: time
   source:
     interval: 24h
@@ -119,7 +119,7 @@ resources:
     location: America/Phoenix
     days: [Sunday, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday]
 
-- name: schedule-apply-changes
+- name: schedule-apply-changes {{schedule-apply-changes-time-window-start}} to {{schedule-apply-changes-time-window-stop}}
   type: time
   source:
     interval: 24h
@@ -131,7 +131,7 @@ resources:
 jobs:
 - name: regulator
   plan:
-  - get: schedule
+  - get: schedule {{scheduler-time-window-start}} to {{scheduler-time-window-stop}}
     trigger: true
   - get: {{ert_resource_name}}
   - get: {{redis_resource_name}}
@@ -446,7 +446,7 @@ jobs:
       globs:
       - om-linux
   - aggregate:
-    - get: schedule-apply-changes
+    - get: schedule-apply-changes {{schedule-apply-changes-time-window-start}} to {{schedule-apply-changes-time-window-stop}}
       trigger: true
     - get: {{ert_resource_name}}
       trigger: true
