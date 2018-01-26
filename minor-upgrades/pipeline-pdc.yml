@@ -126,7 +126,7 @@ resources:
     start: "1:00 AM"
     stop: "1:05 AM"
     location: America/Phoenix
-    days: [Wednesday]
+    days: [Wednesday, Saturday]
 
 jobs:
 - name: regulator
