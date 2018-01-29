@@ -1,0 +1,45 @@
+
+groups: []
+
+resources:
+- name: pcf-pipelines
+  type: git
+  source:
+    uri: https://github.com/aaa-ncnu-ie/pcf-pipelines.git
+    branch: prod
+    username: {{github_token}}
+
+- name: tool-om
+  type: github-release
+  source:
+    user: pivotal-cf
+    repository: om
+    access_token: {{github_token}}
+
+- name: schedule-apply-changes {{schedule-apply-changes-time-window-start}} to {{schedule-apply-changes-time-window-stop}}
+  type: time
+  source:
+    interval: 24h
+    start: {{schedule-apply-changes-time-window-start}}
+    stop: {{schedule-apply-changes-time-window-stop}}
+    location: America/Phoenix
+    days: [Sunday]
+
+jobs:
+- name: apply-changes-now
+  plan:
+  - get: pcf-pipelines
+  - get: tool-om
+    params:
+      globs:
+      - om-linux
+  - aggregate:
+    - get: schedule-apply-changes {{schedule-apply-changes-time-window-start}} to {{schedule-apply-changes-time-window-stop}}
+      trigger: true
+  - task: apply-changes
+    file: pcf-pipelines/tasks/apply-changes/task.yml
+    params:
+      OPSMAN_USERNAME: {{opsman_admin_username}}
+      OPSMAN_PASSWORD: {{opsman_admin_password}}
+      OPSMAN_URI: {{opsman_uri}}
+      OPSMAN_TIMEOUT: {{opsman_timeout_seconds}}
