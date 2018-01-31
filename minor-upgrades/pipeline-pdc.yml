@@ -113,7 +113,6 @@ resources:
 - name: schedule {{scheduler-time-window-start}} to {{scheduler-time-window-stop}}
   type: time
   source:
-    interval: 24h
     start: {{scheduler-time-window-start}}
     stop: {{scheduler-time-window-stop}}
     location: America/Phoenix
@@ -122,11 +121,10 @@ resources:
 - name: schedule-apply-changes {{schedule-apply-changes-time-window-start}} to {{schedule-apply-changes-time-window-stop}}
   type: time
   source:
-    interval: 24h
     start: {{schedule-apply-changes-time-window-start}}
     stop: {{schedule-apply-changes-time-window-stop}}
     location: America/Phoenix
-    days: [Wednesday]
+    days: [Wednesday, Thursday]
 
 jobs:
 - name: regulator
@@ -449,25 +447,18 @@ jobs:
     - get: schedule-apply-changes {{schedule-apply-changes-time-window-start}} to {{schedule-apply-changes-time-window-stop}}
       trigger: true
     - get: {{ert_resource_name}}
-      trigger: false
       passed: [upgrade-ert]
     - get: {{redis_resource_name}}
-      trigger: false
       passed: [upgrade-redis]
     - get: {{jmx_resource_name}}
-      trigger: false
       passed: [upgrade-jmx]
     - get: {{metrics_resource_name}}
-      trigger: false
       passed: [upgrade-metrics]
     - get: {{mysql_resource_name}}
-      trigger: false
       passed: [upgrade-mysql]
 #    - get: {{sso_resource_name}}
-#      trigger: false
 #      passed: [upgrade-sso]
 #    - get: {{cc_resource_name}}
-#      trigger: false
 #      passed: [upgrade-cc]
   - task: apply-changes
     file: pcf-pipelines/tasks/apply-changes/task.yml

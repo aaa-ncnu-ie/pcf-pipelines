@@ -111,7 +111,6 @@ resources:
 - name: schedule {{scheduler-time-window-start}} to {{scheduler-time-window-stop}}
   type: time
   source:
-    interval: {{scheduler-time-interval}}
     start: {{scheduler-time-window-start}}
     stop: {{scheduler-time-window-stop}}
     location: {{scheduler-time-location}}
@@ -120,7 +119,6 @@ resources:
 - name: schedule-apply-changes {{schedule-apply-changes-time-window-start}} to {{schedule-apply-changes-time-window-stop}}
   type: time
   source:
-    interval: {{schedule-apply-changes-time-interval}}
     start: {{schedule-apply-changes-time-window-start}}
     stop: {{schedule-apply-changes-time-window-stop}}
     location: {{schedule-apply-changes-time-location}}
@@ -446,25 +444,18 @@ jobs:
     - get: schedule-apply-changes {{schedule-apply-changes-time-window-start}} to {{schedule-apply-changes-time-window-stop}}
       trigger: true
     - get: {{ert_resource_name}}
-      trigger: false
       passed: [upgrade-ert]
     - get: {{redis_resource_name}}
-      trigger: false
       passed: [upgrade-redis]
     - get: {{jmx_resource_name}}
-      trigger: false
       passed: [upgrade-jmx]
     - get: {{metrics_resource_name}}
-      trigger: false
       passed: [upgrade-metrics]
     - get: {{mysql_resource_name}}
-      trigger: false
       passed: [upgrade-mysql]
     - get: {{sso_resource_name}}
-      trigger: false
       passed: [upgrade-sso]
     - get: {{cc_resource_name}}
-      trigger: false
       passed: [upgrade-cc]
   - task: apply-changes
     file: pcf-pipelines/tasks/apply-changes/task.yml
