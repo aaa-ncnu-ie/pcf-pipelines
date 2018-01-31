@@ -446,25 +446,25 @@ jobs:
     - get: schedule-apply-changes {{schedule-apply-changes-time-window-start}} to {{schedule-apply-changes-time-window-stop}}
       trigger: true
     - get: {{ert_resource_name}}
-      trigger: true
+      trigger: false
       passed: [upgrade-ert]
     - get: {{redis_resource_name}}
-      trigger: true
+      trigger: false
       passed: [upgrade-redis]
     - get: {{jmx_resource_name}}
-      trigger: true
+      trigger: false
       passed: [upgrade-jmx]
     - get: {{metrics_resource_name}}
-      trigger: true
+      trigger: false
       passed: [upgrade-metrics]
     - get: {{mysql_resource_name}}
-      trigger: true
+      trigger: false
       passed: [upgrade-mysql]
     - get: {{sso_resource_name}}
-      trigger: true
+      trigger: false
       passed: [upgrade-sso]
     - get: {{cc_resource_name}}
-      trigger: true
+      trigger: false
       passed: [upgrade-cc]
 
   - task: apply-changes
