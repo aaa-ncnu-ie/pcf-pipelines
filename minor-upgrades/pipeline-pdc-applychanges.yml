@@ -23,7 +23,7 @@ resources:
     start: {{schedule-apply-changes-time-window-start}}
     stop: {{schedule-apply-changes-time-window-stop}}
     location: America/Phoenix
-    days: [Sunday]
+    days: [Sunday, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday]
 
 jobs:
 - name: apply-changes-now
