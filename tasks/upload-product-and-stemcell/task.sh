@@ -1,32 +1,91 @@
-#!/bin/bash -e
+#!/bin/bash
 
-if [[ ! -z "$NO_PROXY" ]]; then
-  echo "$OM_IP $OPS_MGR_HOST" >> /etc/hosts
+set -eu
+
+if [[ -n "$NO_PROXY" ]]; then
+  echo "$OM_IP $OPSMAN_DOMAIN_OR_IP_ADDRESS" >> /etc/hosts
 fi
 
-PIVNET_CLI=`find ./pivnet-cli -name "*linux-amd64*"`
-chmod +x $PIVNET_CLI
+STEMCELL_VERSION=$(
+  cat ./pivnet-product/metadata.json |
+  jq --raw-output \
+    '
+    [
+      .Dependencies[]
+      | select(.Release.Product.Name | contains("Stemcells"))
+      | .Release.Version
+    ]
+    | map(split(".") | map(tonumber))
+    | transpose | transpose
+    | max // empty
+    | map(tostring)
+    | join(".")
+    '
+)
 
-chmod +x tool-om/om-linux
-CMD=./tool-om/om-linux
+if [ -n "$STEMCELL_VERSION" ]; then
+  diagnostic_report=$(
+    om-linux \
+      --target https://$OPSMAN_DOMAIN_OR_IP_ADDRESS \
+      --client-id "${OPSMAN_CLIENT_ID}" \
+      --client-secret "${OPSMAN_CLIENT_SECRET}" \
+      --username "$OPS_MGR_USR" \
+      --password "$OPS_MGR_PWD" \
+      --skip-ssl-validation \
+      curl --silent --path "/api/v0/diagnostic_report"
+  )
 
-FILE_PATH=`find ./pivnet-product -name *.pivotal`
+  stemcell=$(
+    echo $diagnostic_report |
+    jq \
+      --arg version "$STEMCELL_VERSION" \
+      --arg glob "$IAAS" \
+    '.stemcells[] | select(contains($version) and contains($glob))'
+  )
 
-STEMCELL_VERSION=`cat ./pivnet-product/metadata.json | jq '.Dependencies[] | select(.Release.Product.Name | contains("Stemcells")) | .Release.Version'`
+  if [[ -z "$stemcell" ]]; then
+    echo "Downloading stemcell $STEMCELL_VERSION"
 
-echo "Downloading stemcell $STEMCELL_VERSION"
-$PIVNET_CLI login --api-token="$PIVNET_API_TOKEN"
-$PIVNET_CLI download-product-files -p stemcells -r $STEMCELL_VERSION -g "*vsphere*" --accept-eula
+    product_slug=$(
+      jq --raw-output \
+        '
+        if any(.Dependencies[]; select(.Release.Product.Name | contains("Stemcells for PCF (Windows)"))) then
+          "stemcells-windows-server"
+        else
+          "stemcells"
+        end
+        ' < pivnet-product/metadata.json
+    )
 
-SC_FILE_PATH=`find ./ -name *.tgz`
+    pivnet-cli login --api-token="$PIVNET_API_TOKEN"
+    pivnet-cli download-product-files -p "$product_slug" -r $STEMCELL_VERSION -g "*${IAAS}*" --accept-eula
 
-$CMD -t https://$OPS_MGR_HOST -u $OPS_MGR_USR -p $OPS_MGR_PWD -k upload-product -p $FILE_PATH
+    SC_FILE_PATH=`find ./ -name *.tgz`
 
-$CMD -t https://$OPS_MGR_HOST -u $OPS_MGR_USR -p $OPS_MGR_PWD -k upload-stemcell -s $SC_FILE_PATH
+    if [ ! -f "$SC_FILE_PATH" ]; then
+      echo "Stemcell file not found!"
+      exit 1
+    fi
 
-if [ ! -f "$SC_FILE_PATH" ]; then
-    echo "Stemcell file not found!"
-else
-  echo "Removing downloaded stemcell $STEMCELL_VERSION"
-  rm $SC_FILE_PATH
+    om-linux -t https://$OPSMAN_DOMAIN_OR_IP_ADDRESS \
+      --client-id "${OPSMAN_CLIENT_ID}" \
+      --client-secret "${OPSMAN_CLIENT_SECRET}" \
+      -u "$OPS_MGR_USR" \
+      -p "$OPS_MGR_PWD" \
+      -k \
+      upload-stemcell \
+      -s $SC_FILE_PATH
+  fi
 fi
+
+# Should the slug contain more than one product, pick only the first.
+FILE_PATH=`find ./pivnet-product -name *.pivotal | sort | head -1`
+om-linux -t https://$OPSMAN_DOMAIN_OR_IP_ADDRESS \
+  --client-id "${OPSMAN_CLIENT_ID}" \
+  --client-secret "${OPSMAN_CLIENT_SECRET}" \
+  -u "$OPS_MGR_USR" \
+  -p "$OPS_MGR_PWD" \
+  -k \
+  --request-timeout 3600 \
+  upload-product \
+  -p $FILE_PATH

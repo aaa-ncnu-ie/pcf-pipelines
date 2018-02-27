@@ -1,4 +1,6 @@
-#!/bin/bash -eu
+#!/bin/bash
+
+set -eu
 
 # Copyright 2017-Present Pivotal Software, Inc. All rights reserved.
 #
@@ -18,18 +20,17 @@ function main() {
   local cwd
   cwd="${1}"
 
-  chmod +x tool-om/om-linux
-  local om="tool-om/om-linux"
-
   if [ -n "$(find ${cwd}/stemcells/ -prune -empty)" ]; then
     echo "No stemcells found."
     exit 0
   fi
 
   for stemcell in ${cwd}/stemcells/*.tgz; do
-    printf "Uploading %s to %s ...\n" "${stemcell}" "${OPSMAN_URI}"
-    $om --target "${OPSMAN_URI}" \
+    printf "Uploading %s to %s ...\n" "${stemcell}" "${OPSMAN_DOMAIN_OR_IP_ADDRESS}"
+    om-linux --target "https://${OPSMAN_DOMAIN_OR_IP_ADDRESS}" \
         --skip-ssl-validation \
+        --client-id "${OPSMAN_CLIENT_ID}" \
+        --client-secret "${OPSMAN_CLIENT_SECRET}" \
         --username "${OPSMAN_USERNAME}" \
         --password "${OPSMAN_PASSWORD}" \
         upload-stemcell \

@@ -1,12 +1,16 @@
-#!/bin/bash -e
+#!/bin/bash
 
-chmod +x tool-om/om-linux
+set -eu
 
-CMD=./tool-om/om-linux
-
-until $(curl --output /dev/null -k --silent --head --fail https://$OPS_MGR_HOST/setup); do
+until $(curl --output /dev/null -k --silent --head --fail https://$OPSMAN_DOMAIN_OR_IP_ADDRESS/setup); do
     printf '.'
     sleep 5
 done
 
-$CMD -t https://$OPS_MGR_HOST -k configure-authentication -u $OPS_MGR_USR -p $OPS_MGR_PWD -dp $OM_DECRYPTION_PWD
+om-linux \
+  --target https://$OPSMAN_DOMAIN_OR_IP_ADDRESS \
+  --skip-ssl-validation \
+  configure-authentication \
+  --username "$OPS_MGR_USR" \
+  --password "$OPS_MGR_PWD" \
+  --decryption-passphrase $OM_DECRYPTION_PWD

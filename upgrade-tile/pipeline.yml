@@ -29,30 +29,13 @@ resources:
     branch: prod
     username: {{github_token}}
 
-- name: tool-om
-  type: github-release
-  source:
-    user: pivotal-cf
-    repository: om
-    access_token: {{github_token}}
-
-- name: {{resource_name}}
+- name: tile
   type: pivnet
-  check_every: {{pivnet_poll_interval}}
   source:
     api_token: {{pivnet_token}}
     product_slug: {{product_slug}}
-    product_version: {{product_version}}
+    product_version: {{product_version_regex}}
     sort_by: semver
-
-- name: stemcell-downloader
-  type: github-release
-  source:
-    user: pivotal-cf
-    repository: pcf-product-stemcell-downloader
-    access_token: {{github_token}}
-    globs:
-    - stemcell-downloader-linux
 
 - name: schedule
   type: time
@@ -68,15 +51,15 @@ jobs:
   plan:
   - get: schedule
     trigger: true
-  - get: {{resource_name}}
+  - get: tile
     params: { globs: [] }
 
-- name: upgrade-tile
+- name: upload-and-stage-tile
   plan:
   - aggregate:
     - get: pcf-pipelines
     - get: pivnet-product
-      resource: {{resource_name}}
+      resource: tile
       passed: [regulator]
       trigger: true
       params:
@@ -85,45 +68,77 @@ jobs:
     - get: tool-om
       params:
         globs:
-        - om-linux
-    - get: stemcell-downloader
-      params:
-        globs: [stemcell-downloader-linux]
+        - {{product_globs}}
 
   - task: wait-opsman-clear
     file: pcf-pipelines/tasks/wait-opsman-clear/task.yml
     params:
+      OPSMAN_CLIENT_ID: {{opsman_client_id}}
+      OPSMAN_CLIENT_SECRET: {{opsman_client_secret}}
       OPSMAN_USERNAME: {{opsman_admin_username}}
       OPSMAN_PASSWORD: {{opsman_admin_password}}
-      OPSMAN_URI: {{opsman_uri}}
+      OPSMAN_DOMAIN_OR_IP_ADDRESS: {{opsman_domain_or_ip_address}}
 
-  - task: upload-tile
-    file: pcf-pipelines/tasks/upload-product/task.yml
+  - task: upload-tile-and-stemcell
+    file: pcf-pipelines/tasks/upload-product-and-stemcell/task.yml
     params:
-      OPSMAN_USERNAME: {{opsman_admin_username}}
-      OPSMAN_PASSWORD: {{opsman_admin_password}}
-      OPSMAN_URI: {{opsman_uri}}
-      PIVNET_PRODUCT_NAME: {{product_slug}}
-      TILE_UPLOAD_TIMEOUT: {{tile_upload_timeout}}
+      IAAS: {{iaas_type}}
+      OPSMAN_DOMAIN_OR_IP_ADDRESS: {{opsman_domain_or_ip_address}}
+      OPSMAN_CLIENT_ID: {{opsman_client_id}}
+      OPSMAN_CLIENT_SECRET: {{opsman_client_secret}}
+      OPS_MGR_USR: {{opsman_admin_username}}
+      OPS_MGR_PWD: {{opsman_admin_password}}
+      PIVNET_API_TOKEN: {{pivnet_token}}
+      NO_PROXY: ""
+      OM_IP: ""
+
   - task: stage-tile
     file: pcf-pipelines/tasks/stage-product/task.yml
     params:
+      OPSMAN_CLIENT_ID: {{opsman_client_id}}
+      OPSMAN_CLIENT_SECRET: {{opsman_client_secret}}
       OPSMAN_USERNAME: {{opsman_admin_username}}
       OPSMAN_PASSWORD: {{opsman_admin_password}}
-      OPSMAN_URI: {{opsman_uri}}
-      PRODUCT_NAME: {{product_name}}
-  - task: upload-stemcell
-    file: pcf-pipelines/tasks/upload-stemcell/task.yml
+      OPSMAN_DOMAIN_OR_IP_ADDRESS: {{opsman_domain_or_ip_address}}
+
+  - task: toggle-errands
+    file: pcf-pipelines/tasks/toggle-errands/task.yml
     params:
-      PRODUCT: {{metadata_basename}}
-      IAAS_TYPE: {{iaas_type}}
+      ENABLE_ERRANDS: {{enable_errands}}
+      OPSMAN_CLIENT_ID: {{opsman_client_id}}
+      OPSMAN_CLIENT_SECRET: {{opsman_client_secret}}
       OPSMAN_USERNAME: {{opsman_admin_username}}
       OPSMAN_PASSWORD: {{opsman_admin_password}}
-      OPSMAN_URI: {{opsman_uri}}
+      OPSMAN_DOMAIN_OR_IP_ADDRESS: {{opsman_domain_or_ip_address}}
+
+- name: apply-changes
+  plan:
+  - aggregate:
+    - get: pcf-pipelines
+    - get: pivnet-product
+      resource: tile
+      passed: [ upload-and-stage-tile ]
+      trigger: true
+      params:
+        globs: [ ]
   - task: apply-changes
     file: pcf-pipelines/tasks/apply-changes/task.yml
     params:
+      OPSMAN_CLIENT_ID: {{opsman_client_id}}
+      OPSMAN_CLIENT_SECRET: {{opsman_client_secret}}
       OPSMAN_USERNAME: {{opsman_admin_username}}
       OPSMAN_PASSWORD: {{opsman_admin_password}}
-      OPSMAN_URI: {{opsman_uri}}
-      OPSMAN_TIMEOUT: {{opsman_timeout_seconds}}
+      OPSMAN_DOMAIN_OR_IP_ADDRESS: {{opsman_domain_or_ip_address}}
+
+- name: delete-unused-products
+  plan:
+  - aggregate:
+    - get: pcf-pipelines
+  - task: delete-unused-products
+    file: pcf-pipelines/tasks/delete-unused-products/task.yml
+    params:
+      OPSMAN_CLIENT_ID: {{opsman_client_id}}
+      OPSMAN_CLIENT_SECRET: {{opsman_client_secret}}
+      OPSMAN_USERNAME: {{opsman_admin_username}}
+      OPSMAN_PASSWORD: {{opsman_admin_password}}
+      OPSMAN_DOMAIN_OR_IP_ADDRESS: {{opsman_domain_or_ip_address}}

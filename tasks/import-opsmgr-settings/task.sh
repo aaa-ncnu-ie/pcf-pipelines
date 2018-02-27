@@ -1,4 +1,6 @@
-#!/bin/bash -eu
+#!/bin/bash
+
+set -eu
 
 # Copyright 2017-Present Pivotal Software, Inc. All rights reserved.
 #
@@ -18,18 +20,16 @@ function main() {
   local cwd
   cwd="${1}"
 
-  chmod +x tool-om/om-linux
-  local om="tool-om/om-linux"
-
-  printf "Waiting for %s to come up" "$OPSMAN_URI"
-  until $(curl --output /dev/null --silent --head --fail -k ${OPSMAN_URI}); do
+  printf "Waiting for %s to come up" "$OPSMAN_DOMAIN_OR_IP_ADDRESS"
+  until $(curl --output /dev/null --silent --head --fail -k https://${OPSMAN_DOMAIN_OR_IP_ADDRESS}); do
     printf '.'
     sleep 5
   done
   printf '\n'
 
-  $om --target "${OPSMAN_URI}" \
+  om-linux --target "https://${OPSMAN_DOMAIN_OR_IP_ADDRESS}" \
       --skip-ssl-validation \
+      --request-timeout 86400 \
       import-installation \
       --installation "${cwd}/opsmgr-settings/${OPSMAN_SETTINGS_FILENAME}" \
       --decryption-passphrase "${OPSMAN_PASSPHRASE}"

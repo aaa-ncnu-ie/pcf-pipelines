@@ -1,4 +1,6 @@
-#!/bin/bash -eu
+#!/bin/bash
+
+set -eu
 
 # Copyright 2017-Present Pivotal Software, Inc. All rights reserved.
 #
@@ -14,21 +16,58 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function main() {
+function check_for_no_pending_changes() {
+  local pending_changes_count=$(om-linux \
+    --target "https://${OPSMAN_DOMAIN_OR_IP_ADDRESS}" \
+    --skip-ssl-validation \
+    --client-id "${OPSMAN_CLIENT_ID}" \
+    --client-secret "${OPSMAN_CLIENT_SECRET}" \
+    --username "${OPSMAN_USERNAME}" \
+    --password "${OPSMAN_PASSWORD}" \
+    curl -path /api/v0/staged/pending_changes | jq ".product_changes | length")
+  if [[ $pending_changes_count -ne 0 ]]; then
+    echo "Detected $pending_changes_count pending changes. Aborting."
+    exit 1
+  fi
+}
 
-  chmod +x tool-om/om-linux
-  CMD_PATH="tool-om/om-linux"
+function dump_installations() {
+  om-linux --target "https://${OPSMAN_DOMAIN_OR_IP_ADDRESS}" \
+    --skip-ssl-validation \
+    --client-id "${OPSMAN_CLIENT_ID}" \
+    --client-secret "${OPSMAN_CLIENT_SECRET}" \
+    --username "${OPSMAN_USERNAME}" \
+    --password "${OPSMAN_PASSWORD}" \
+    curl -path /api/v0/installations | jq -S .
+}
+
+function main() {
 
   local cwd
   cwd="${1}"
 
-  ./${CMD_PATH} --target "${OPSMAN_URI}" \
+  check_for_no_pending_changes
+
+  dump_installations > installations-before.json
+
+  om-linux --target "https://${OPSMAN_DOMAIN_OR_IP_ADDRESS}" \
      --skip-ssl-validation \
+     --client-id "${OPSMAN_CLIENT_ID}" \
+     --client-secret "${OPSMAN_CLIENT_SECRET}" \
      --username "${OPSMAN_USERNAME}" \
      --password "${OPSMAN_PASSWORD}" \
      --request-timeout 6000 \
      export-installation \
      --output-file "${cwd}/opsmgr-settings/${OPSMAN_SETTINGS_FILENAME}"
+
+  dump_installations > installations-after.json
+
+  if [[ "$(cat installations-after.json)" != "$(cat installations-before.json)" ]]; then
+    echo "Detected changes in the installation log (change log)."
+    exit 1
+  fi
+
+  check_for_no_pending_changes
 }
 
 main "${PWD}"

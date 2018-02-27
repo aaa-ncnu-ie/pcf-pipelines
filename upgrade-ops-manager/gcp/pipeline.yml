@@ -22,40 +22,18 @@ resource_types:
 resources:
 - name: pivnet-opsmgr
   type: pivnet
-  check_every: {{check_new_opsman_every}}
   source:
     api_token: {{pivnet_token}}
     product_slug: ops-manager
     product_version: {{opsman_major_minor_version}}
     sort_by: semver
 
-- name: tool-cliaas
-  type: github-release
-  source:
-    user: pivotal-cf 
-    repository: cliaas
-    access_token: {{github_token}}
-
-- name: tool-om
-  type: github-release
-  source:
-    user: pivotal-cf
-    repository: om
-    access_token: {{github_token}}
-
-- name: tool-pivnet-cli
-  type: github-release
-  source:
-    user: pivotal-cf
-    repository: pivnet-cli
-    access_token: {{github_token}}
-
 - name: pcf-pipelines
   type: git
   source:
-    uri: https://github.com/pivotal-cf/pcf-pipelines.git
+    uri: git@github.com:pivotal-cf/pcf-pipelines.git
     branch: master
-    username: {{github_token}}
+    private_key: {{git_private_key}}
 
 - name: schedule
   type: time
@@ -80,51 +58,47 @@ jobs:
   - aggregate:
     - get: pivnet-opsmgr
       passed: [regulator]
-      trigger: true 
+      trigger: true
       params:
         globs:
         - "*GCP.yml"
-    - get: tool-cliaas
-      params:
-        globs: ["*linux*"]
     - get: pcf-pipelines
-
-    - get: tool-om
-      params:
-        globs: ["*linux*"]
-    - get: tool-pivnet-cli
-      params:
-        globs: ["*linux*"]
 
   - task: wait-opsman-clear
     file: pcf-pipelines/tasks/wait-opsman-clear/task.yml
     params:
+      OPSMAN_CLIENT_ID: {{opsman_client_id}}
+      OPSMAN_CLIENT_SECRET: {{opsman_client_secret}}
       OPSMAN_USERNAME: {{opsman_admin_username}}
       OPSMAN_PASSWORD: {{opsman_admin_password}}
-      OPSMAN_URI: {{opsman_uri}}
+      OPSMAN_DOMAIN_OR_IP_ADDRESS: {{opsman_domain_or_ip_address}}
 
   - aggregate:
     - task: export-opsmgr-settings
       file: pcf-pipelines/tasks/export-opsmgr-settings/task.yml
       params:
+        OPSMAN_CLIENT_ID: {{opsman_client_id}}
+        OPSMAN_CLIENT_SECRET: {{opsman_client_secret}}
         OPSMAN_USERNAME: {{opsman_admin_username}}
         OPSMAN_PASSWORD: {{opsman_admin_password}}
-        OPSMAN_URI: {{opsman_uri}}
+        OPSMAN_DOMAIN_OR_IP_ADDRESS: {{opsman_domain_or_ip_address}}
         OPSMAN_SETTINGS_FILENAME: installation.zip
     - task: exported-opsmgr-diagnostic-report
       file: pcf-pipelines/tasks/export-opsmgr-diagnostic-report/task.yml
       params:
+        OPSMAN_CLIENT_ID: {{opsman_client_id}}
+        OPSMAN_CLIENT_SECRET: {{opsman_client_secret}}
         OPSMAN_USERNAME: {{opsman_admin_username}}
         OPSMAN_PASSWORD: {{opsman_admin_password}}
-        OPSMAN_URI: {{opsman_uri}}
+        OPSMAN_DOMAIN_OR_IP_ADDRESS: {{opsman_domain_or_ip_address}}
 
   - task: create-cliaas-config
-    file: pcf-pipelines/tasks/create-cliaas-config-gcp/task.yml
+    file: pcf-pipelines/upgrade-ops-manager/gcp/tasks/create-cliaas-config/task.yml
     params:
       PIVNET_IMAGE_REGION: {{pivnet_image_region}}
-      OPSMAN_PROJECT: {{opsman_gcp_project}}
-      OPSMAN_ZONE: {{opsman_gcp_zone}}
-      OPSMAN_GCP_CREDFILE_CONTENTS: {{opsman_gcp_credfile_contents}}
+      GCP_PROJECT_ID: {{gcp_project_id}}
+      GCP_ZONE: {{gcp_zone}}
+      GCP_SERVICE_ACCOUNT_KEY: {{gcp_service_account_key}}
 
   - task: replace-opsman-vm
     file: pcf-pipelines/tasks/replace-vm/task.yml
@@ -134,9 +108,11 @@ jobs:
   - task: import-opsmgr-settings
     file: pcf-pipelines/tasks/import-opsmgr-settings/task.yml
     params:
+      OPSMAN_CLIENT_ID: {{opsman_client_id}}
+      OPSMAN_CLIENT_SECRET: {{opsman_client_secret}}
       OPSMAN_USERNAME: {{opsman_admin_username}}
       OPSMAN_PASSWORD: {{opsman_admin_password}}
-      OPSMAN_URI: {{opsman_uri}}
+      OPSMAN_DOMAIN_OR_IP_ADDRESS: {{opsman_domain_or_ip_address}}
       OPSMAN_SETTINGS_FILENAME: installation.zip
       OPSMAN_PASSPHRASE: {{opsman_passphrase}}
 
@@ -144,19 +120,22 @@ jobs:
     file: pcf-pipelines/tasks/download-pivnet-stemcells/task.yml
     params:
       API_TOKEN: {{pivnet_token}}
-      IAAS_TYPE: gcp 
+      IAAS_TYPE: google
 
   - task: restore-stemcells
     file: pcf-pipelines/tasks/restore-stemcells/task.yml
     params:
+      OPSMAN_CLIENT_ID: {{opsman_client_id}}
+      OPSMAN_CLIENT_SECRET: {{opsman_client_secret}}
       OPSMAN_USERNAME: {{opsman_admin_username}}
       OPSMAN_PASSWORD: {{opsman_admin_password}}
-      OPSMAN_URI: {{opsman_uri}}
+      OPSMAN_DOMAIN_OR_IP_ADDRESS: {{opsman_domain_or_ip_address}}
 
   - task: apply-changes
     file: pcf-pipelines/tasks/apply-changes/task.yml
     params:
+      OPSMAN_CLIENT_ID: {{opsman_client_id}}
+      OPSMAN_CLIENT_SECRET: {{opsman_client_secret}}
       OPSMAN_USERNAME: {{opsman_admin_username}}
       OPSMAN_PASSWORD: {{opsman_admin_password}}
-      OPSMAN_URI: {{opsman_uri}}
-      OPSMAN_TIMEOUT: {{opsman_timeout_seconds}}
+      OPSMAN_DOMAIN_OR_IP_ADDRESS: {{opsman_domain_or_ip_address}}
