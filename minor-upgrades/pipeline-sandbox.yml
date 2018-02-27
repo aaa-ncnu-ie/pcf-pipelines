@@ -99,6 +99,24 @@ resources:
     product_version: {{cc_product_version}}
     sort_by: semver
 
+- name: {{rabbit_resource_name}}
+  type: pivnet
+  check_every: {{pivnet_poll_interval}}
+  source:
+    api_token: {{pivnet_token}}
+    product_slug: {{rabbit_product_slug}}
+    product_version: {{rabbit_product_version}}
+    sort_by: semver
+
+- name: {{mysqlv2_resource_name}}
+  type: pivnet
+  check_every: {{pivnet_poll_interval}}
+  source:
+    api_token: {{pivnet_token}}
+    product_slug: {{mysqlv2_product_slug}}
+    product_version: {{mysqlv2_product_version}}
+    sort_by: semver
+
 - name: stemcell-downloader
   type: github-release
   source:
@@ -136,6 +154,8 @@ jobs:
   - get: {{mysql_resource_name}}
   - get: {{sso_resource_name}}
   - get: {{cc_resource_name}}
+  - get: {{rabbit_resource_name}}
+  - get: {{mysqlv2_resource_name}}
     params: { globs: [] }
 
 - name: upgrade-ert
@@ -433,6 +453,90 @@ jobs:
       OPSMAN_PASSWORD: {{opsman_admin_password}}
       OPSMAN_URI: {{opsman_uri}}
 
+- name: upgrade-rabbit
+  plan:
+  - aggregate:
+    - get: pcf-pipelines
+    - get: pivnet-product
+      resource: {{rabbit_resource_name}}
+      passed: [regulator]
+      trigger: true
+      params:
+        globs:
+        - "*pivotal"
+    - get: tool-om
+      params:
+        globs:
+        - om-linux
+    - get: stemcell-downloader
+      params:
+        globs: [stemcell-downloader-linux]
+  - task: upload-tile
+    file: pcf-pipelines/tasks/upload-product/task.yml
+    params:
+      OPSMAN_USERNAME: {{opsman_admin_username}}
+      OPSMAN_PASSWORD: {{opsman_admin_password}}
+      OPSMAN_URI: {{opsman_uri}}
+      PIVNET_PRODUCT_NAME: {{rabbit_product_slug}}
+      TILE_UPLOAD_TIMEOUT: {{tile_upload_timeout}}
+  - task: stage-tile
+    file: pcf-pipelines/tasks/stage-product/task.yml
+    params:
+      OPSMAN_USERNAME: {{opsman_admin_username}}
+      OPSMAN_PASSWORD: {{opsman_admin_password}}
+      OPSMAN_URI: {{opsman_uri}}
+      PRODUCT_NAME: {{rabbit_product_name}}
+  - task: upload-stemcell
+    file: pcf-pipelines/tasks/upload-stemcell/task.yml
+    params:
+      PRODUCT: {{rabbit_metadata_basename}}
+      IAAS_TYPE: {{iaas_type}}
+      OPSMAN_USERNAME: {{opsman_admin_username}}
+      OPSMAN_PASSWORD: {{opsman_admin_password}}
+      OPSMAN_URI: {{opsman_uri}}
+
+- name: upgrade-mysqlv2
+  plan:
+  - aggregate:
+    - get: pcf-pipelines
+    - get: pivnet-product
+      resource: {{mysqlv2_resource_name}}
+      passed: [regulator]
+      trigger: true
+      params:
+        globs:
+        - "*pivotal"
+    - get: tool-om
+      params:
+        globs:
+        - om-linux
+    - get: stemcell-downloader
+      params:
+        globs: [stemcell-downloader-linux]
+  - task: upload-tile
+    file: pcf-pipelines/tasks/upload-product/task.yml
+    params:
+      OPSMAN_USERNAME: {{opsman_admin_username}}
+      OPSMAN_PASSWORD: {{opsman_admin_password}}
+      OPSMAN_URI: {{opsman_uri}}
+      PIVNET_PRODUCT_NAME: {{mysqlv2_product_slug}}
+      TILE_UPLOAD_TIMEOUT: {{tile_upload_timeout}}
+  - task: stage-tile
+    file: pcf-pipelines/tasks/stage-product/task.yml
+    params:
+      OPSMAN_USERNAME: {{opsman_admin_username}}
+      OPSMAN_PASSWORD: {{opsman_admin_password}}
+      OPSMAN_URI: {{opsman_uri}}
+      PRODUCT_NAME: {{mysqlv2_product_name}}
+  - task: upload-stemcell
+    file: pcf-pipelines/tasks/upload-stemcell/task.yml
+    params:
+      PRODUCT: {{mysqlv2_metadata_basename}}
+      IAAS_TYPE: {{iaas_type}}
+      OPSMAN_USERNAME: {{opsman_admin_username}}
+      OPSMAN_PASSWORD: {{opsman_admin_password}}
+      OPSMAN_URI: {{opsman_uri}}
+
 - name: apply-changes-now
   plan:
   - get: pcf-pipelines
@@ -457,6 +561,10 @@ jobs:
       passed: [upgrade-sso]
     - get: {{cc_resource_name}}
       passed: [upgrade-cc]
+    - get: {{rabbit_resource_name}}
+      passed: [upgrade-rabbit]
+    - get: {{mysqlv2_resource_name}}
+      passed: [upgrade-mysqlv2]
 
   - task: apply-changes
     file: pcf-pipelines/tasks/apply-changes/task.yml
