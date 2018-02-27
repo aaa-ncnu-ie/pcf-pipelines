@@ -177,7 +177,7 @@ jobs:
       params:
         globs: [stemcell-downloader-linux]
   - task: upload-tile
-    file: pcf-pipelines/tasks/upload-product/task.yml
+    file: pcf-pipelines/tasks/upload-product-and-stemcell/task.yml
     params:
       OPSMAN_USERNAME: {{opsman_admin_username}}
       OPSMAN_PASSWORD: {{opsman_admin_password}}
@@ -219,7 +219,7 @@ jobs:
       params:
         globs: [stemcell-downloader-linux]
   - task: upload-tile
-    file: pcf-pipelines/tasks/upload-product/task.yml
+    file: pcf-pipelines/tasks/upload-product-and-stemcell/task.yml
     params:
       OPSMAN_USERNAME: {{opsman_admin_username}}
       OPSMAN_PASSWORD: {{opsman_admin_password}}
@@ -261,7 +261,7 @@ jobs:
       params:
         globs: [stemcell-downloader-linux]
   - task: upload-tile
-    file: pcf-pipelines/tasks/upload-product/task.yml
+    file: pcf-pipelines/tasks/upload-product-and-stemcell/task.yml
     params:
       OPSMAN_USERNAME: {{opsman_admin_username}}
       OPSMAN_PASSWORD: {{opsman_admin_password}}
@@ -303,7 +303,7 @@ jobs:
       params:
         globs: [stemcell-downloader-linux]
   - task: upload-tile
-    file: pcf-pipelines/tasks/upload-product/task.yml
+    file: pcf-pipelines/tasks/upload-product-and-stemcell/task.yml
     params:
       OPSMAN_USERNAME: {{opsman_admin_username}}
       OPSMAN_PASSWORD: {{opsman_admin_password}}
@@ -345,7 +345,7 @@ jobs:
       params:
         globs: [stemcell-downloader-linux]
   - task: upload-tile
-    file: pcf-pipelines/tasks/upload-product/task.yml
+    file: pcf-pipelines/tasks/upload-product-and-stemcell/task.yml
     params:
       OPSMAN_USERNAME: {{opsman_admin_username}}
       OPSMAN_PASSWORD: {{opsman_admin_password}}
@@ -387,7 +387,7 @@ jobs:
       params:
         globs: [stemcell-downloader-linux]
   - task: upload-tile
-    file: pcf-pipelines/tasks/upload-product/task.yml
+    file: pcf-pipelines/tasks/upload-product-and-stemcell/task.yml
     params:
       OPSMAN_USERNAME: {{opsman_admin_username}}
       OPSMAN_PASSWORD: {{opsman_admin_password}}
@@ -430,7 +430,7 @@ jobs:
       params:
         globs: [stemcell-downloader-linux]
   - task: upload-tile
-    file: pcf-pipelines/tasks/upload-product/task.yml
+    file: pcf-pipelines/tasks/upload-product-and-stemcell/task.yml
     params:
       OPSMAN_USERNAME: {{opsman_admin_username}}
       OPSMAN_PASSWORD: {{opsman_admin_password}}
@@ -472,7 +472,7 @@ jobs:
       params:
         globs: [stemcell-downloader-linux]
   - task: upload-tile
-    file: pcf-pipelines/tasks/upload-product/task.yml
+    file: pcf-pipelines/tasks/upload-product-and-stemcell/task.yml
     params:
       OPSMAN_USERNAME: {{opsman_admin_username}}
       OPSMAN_PASSWORD: {{opsman_admin_password}}
@@ -514,7 +514,7 @@ jobs:
       params:
         globs: [stemcell-downloader-linux]
   - task: upload-tile
-    file: pcf-pipelines/tasks/upload-product/task.yml
+    file: pcf-pipelines/tasks/upload-product-and-stemcell/task.yml
     params:
       OPSMAN_USERNAME: {{opsman_admin_username}}
       OPSMAN_PASSWORD: {{opsman_admin_password}}
