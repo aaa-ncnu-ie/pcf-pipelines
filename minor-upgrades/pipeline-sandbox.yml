@@ -27,7 +27,14 @@ resources:
   source:
     uri: https://github.com/aaa-ncnu-ie/pcf-pipelines.git
     branch: prod
-    username: {{github_token}}
+    username: {{git_private_key}}
+
+#- name: tool-om
+#  type: github-release
+#  source:
+#    user: pivotal-cf
+#    repository: om
+#    access_token: {{git_private_key}}
 
 - name: {{ert_resource_name}}
   type: pivnet
@@ -150,10 +157,10 @@ jobs:
       resource: {{ert_resource_name}}
       passed: [regulator]
       trigger: true
-      params:
-        globs:
-        - "*pivotal"
-    - get: tool-om
+  #    params:
+  #      globs:
+  #      - "*pivotal"
+  #  - get: tool-om
       params:
         globs:
         - {{ert_product_globs}}
@@ -163,8 +170,10 @@ jobs:
     params:
       IAAS: {{iaas_type}}
       OPSMAN_DOMAIN_OR_IP_ADDRESS: {{opsman_domain_or_ip_address}}
-      OPSMAN_USERNAME: {{opsman_admin_username}}
-      OPSMAN_PASSWORD: {{opsman_admin_password}}
+      OPSMAN_CLIENT_ID: {{opsman_client_id}}
+      OPSMAN_CLIENT_SECRET: {{opsman_client_secret}}
+      OPS_MGR_USR: {{opsman_admin_username}}
+      OPS_MGR_PWD: {{opsman_admin_password}}
       PIVNET_API_TOKEN: {{pivnet_token}}
       NO_PROXY: ""
       OM_IP: ""
@@ -172,6 +181,8 @@ jobs:
   - task: stage-tile
     file: pcf-pipelines/tasks/stage-product/task.yml
     params:
+      OPSMAN_CLIENT_ID: {{opsman_client_id}}
+      OPSMAN_CLIENT_SECRET: {{opsman_client_secret}}
       OPSMAN_USERNAME: {{opsman_admin_username}}
       OPSMAN_PASSWORD: {{opsman_admin_password}}
       OPSMAN_DOMAIN_OR_IP_ADDRESS: {{opsman_domain_or_ip_address}}
@@ -180,6 +191,8 @@ jobs:
     file: pcf-pipelines/tasks/toggle-errands/task.yml
     params:
       ENABLE_ERRANDS: {{enable_errands}}
+      OPSMAN_CLIENT_ID: {{opsman_client_id}}
+      OPSMAN_CLIENT_SECRET: {{opsman_client_secret}}
       OPSMAN_USERNAME: {{opsman_admin_username}}
       OPSMAN_PASSWORD: {{opsman_admin_password}}
       OPSMAN_DOMAIN_OR_IP_ADDRESS: {{opsman_domain_or_ip_address}}
@@ -192,10 +205,10 @@ jobs:
       resource: {{redis_resource_name}}
       passed: [regulator]
       trigger: true
-      params:
-        globs:
-        - "*pivotal"
-    - get: tool-om
+  #    params:
+  #      globs:
+  #      - "*pivotal"
+  #  - get: tool-om
       params:
         globs:
         - {{redis_product_globs}}
@@ -205,8 +218,10 @@ jobs:
     params:
       IAAS: {{iaas_type}}
       OPSMAN_DOMAIN_OR_IP_ADDRESS: {{opsman_domain_or_ip_address}}
-      OPSMAN_USERNAME: {{opsman_admin_username}}
-      OPSMAN_PASSWORD: {{opsman_admin_password}}
+      OPSMAN_CLIENT_ID: {{opsman_client_id}}
+      OPSMAN_CLIENT_SECRET: {{opsman_client_secret}}
+      OPS_MGR_USR: {{opsman_admin_username}}
+      OPS_MGR_PWD: {{opsman_admin_password}}
       PIVNET_API_TOKEN: {{pivnet_token}}
       NO_PROXY: ""
       OM_IP: ""
@@ -214,6 +229,8 @@ jobs:
   - task: stage-tile
     file: pcf-pipelines/tasks/stage-product/task.yml
     params:
+      OPSMAN_CLIENT_ID: {{opsman_client_id}}
+      OPSMAN_CLIENT_SECRET: {{opsman_client_secret}}
       OPSMAN_USERNAME: {{opsman_admin_username}}
       OPSMAN_PASSWORD: {{opsman_admin_password}}
       OPSMAN_DOMAIN_OR_IP_ADDRESS: {{opsman_domain_or_ip_address}}
@@ -222,6 +239,8 @@ jobs:
     file: pcf-pipelines/tasks/toggle-errands/task.yml
     params:
       ENABLE_ERRANDS: {{enable_errands}}
+      OPSMAN_CLIENT_ID: {{opsman_client_id}}
+      OPSMAN_CLIENT_SECRET: {{opsman_client_secret}}
       OPSMAN_USERNAME: {{opsman_admin_username}}
       OPSMAN_PASSWORD: {{opsman_admin_password}}
       OPSMAN_DOMAIN_OR_IP_ADDRESS: {{opsman_domain_or_ip_address}}
@@ -234,21 +253,23 @@ jobs:
       resource: {{jmx_resource_name}}
       passed: [regulator]
       trigger: true
-      params:
-        globs:
-        - "*pivotal"
-    - get: tool-om
+  #    params:
+  #      globs:
+  #      - "*pivotal"
+  #  - get: tool-om
       params:
         globs:
         - {{jmx_product_globs}}
 
-  - task: upload-tile
+  - task: upload-tile-and-stemcell
     file: pcf-pipelines/tasks/upload-product-and-stemcell/task.yml
     params:
       IAAS: {{iaas_type}}
       OPSMAN_DOMAIN_OR_IP_ADDRESS: {{opsman_domain_or_ip_address}}
-      OPSMAN_USERNAME: {{opsman_admin_username}}
-      OPSMAN_PASSWORD: {{opsman_admin_password}}
+      OPSMAN_CLIENT_ID: {{opsman_client_id}}
+      OPSMAN_CLIENT_SECRET: {{opsman_client_secret}}
+      OPS_MGR_USR: {{opsman_admin_username}}
+      OPS_MGR_PWD: {{opsman_admin_password}}
       PIVNET_API_TOKEN: {{pivnet_token}}
       NO_PROXY: ""
       OM_IP: ""
@@ -256,6 +277,8 @@ jobs:
   - task: stage-tile
     file: pcf-pipelines/tasks/stage-product/task.yml
     params:
+      OPSMAN_CLIENT_ID: {{opsman_client_id}}
+      OPSMAN_CLIENT_SECRET: {{opsman_client_secret}}
       OPSMAN_USERNAME: {{opsman_admin_username}}
       OPSMAN_PASSWORD: {{opsman_admin_password}}
       OPSMAN_DOMAIN_OR_IP_ADDRESS: {{opsman_domain_or_ip_address}}
@@ -264,6 +287,8 @@ jobs:
     file: pcf-pipelines/tasks/toggle-errands/task.yml
     params:
       ENABLE_ERRANDS: {{enable_errands}}
+      OPSMAN_CLIENT_ID: {{opsman_client_id}}
+      OPSMAN_CLIENT_SECRET: {{opsman_client_secret}}
       OPSMAN_USERNAME: {{opsman_admin_username}}
       OPSMAN_PASSWORD: {{opsman_admin_password}}
       OPSMAN_DOMAIN_OR_IP_ADDRESS: {{opsman_domain_or_ip_address}}
@@ -276,21 +301,23 @@ jobs:
       resource: {{metrics_resource_name}}
       passed: [regulator]
       trigger: true
-      params:
-        globs:
-        - "*pivotal"
-    - get: tool-om
+  #    params:
+  #      globs:
+  #      - "*pivotal"
+  #  - get: tool-om
       params:
         globs:
         - {{metrics_product_globs}}
 
-  - task: upload-tile
+  - task: upload-tile-and-stemcell
     file: pcf-pipelines/tasks/upload-product-and-stemcell/task.yml
     params:
       IAAS: {{iaas_type}}
       OPSMAN_DOMAIN_OR_IP_ADDRESS: {{opsman_domain_or_ip_address}}
-      OPSMAN_USERNAME: {{opsman_admin_username}}
-      OPSMAN_PASSWORD: {{opsman_admin_password}}
+      OPSMAN_CLIENT_ID: {{opsman_client_id}}
+      OPSMAN_CLIENT_SECRET: {{opsman_client_secret}}
+      OPS_MGR_USR: {{opsman_admin_username}}
+      OPS_MGR_PWD: {{opsman_admin_password}}
       PIVNET_API_TOKEN: {{pivnet_token}}
       NO_PROXY: ""
       OM_IP: ""
@@ -298,15 +325,19 @@ jobs:
   - task: stage-tile
     file: pcf-pipelines/tasks/stage-product/task.yml
     params:
+      OPSMAN_CLIENT_ID: {{opsman_client_id}}
+      OPSMAN_CLIENT_SECRET: {{opsman_client_secret}}
       OPSMAN_USERNAME: {{opsman_admin_username}}
       OPSMAN_PASSWORD: {{opsman_admin_password}}
-      OPSMAN_URI: {{opsman_uri}}
-      PRODUCT_NAME: {{metrics_product_name}}
+      OPSMAN_DOMAIN_OR_IP_ADDRESS: {{opsman_domain_or_ip_address}}
+
 
   - task: toggle-errands
     file: pcf-pipelines/tasks/toggle-errands/task.yml
     params:
       ENABLE_ERRANDS: {{enable_errands}}
+      OPSMAN_CLIENT_ID: {{opsman_client_id}}
+      OPSMAN_CLIENT_SECRET: {{opsman_client_secret}}
       OPSMAN_USERNAME: {{opsman_admin_username}}
       OPSMAN_PASSWORD: {{opsman_admin_password}}
       OPSMAN_DOMAIN_OR_IP_ADDRESS: {{opsman_domain_or_ip_address}}
@@ -319,10 +350,10 @@ jobs:
       resource: {{mysql_resource_name}}
       passed: [regulator]
       trigger: true
-      params:
-        globs:
-        - "*pivotal"
-    - get: tool-om
+#      params:
+#        globs:
+#        - "*pivotal"
+#    - get: tool-om
       params:
         globs:
         - {{mysql_product_globs}}
@@ -332,8 +363,10 @@ jobs:
     params:
       IAAS: {{iaas_type}}
       OPSMAN_DOMAIN_OR_IP_ADDRESS: {{opsman_domain_or_ip_address}}
-      OPSMAN_USERNAME: {{opsman_admin_username}}
-      OPSMAN_PASSWORD: {{opsman_admin_password}}
+      OPSMAN_CLIENT_ID: {{opsman_client_id}}
+      OPSMAN_CLIENT_SECRET: {{opsman_client_secret}}
+      OPS_MGR_USR: {{opsman_admin_username}}
+      OPS_MGR_PWD: {{opsman_admin_password}}
       PIVNET_API_TOKEN: {{pivnet_token}}
       NO_PROXY: ""
       OM_IP: ""
@@ -341,6 +374,8 @@ jobs:
   - task: stage-tile
     file: pcf-pipelines/tasks/stage-product/task.yml
     params:
+      OPSMAN_CLIENT_ID: {{opsman_client_id}}
+      OPSMAN_CLIENT_SECRET: {{opsman_client_secret}}
       OPSMAN_USERNAME: {{opsman_admin_username}}
       OPSMAN_PASSWORD: {{opsman_admin_password}}
       OPSMAN_DOMAIN_OR_IP_ADDRESS: {{opsman_domain_or_ip_address}}
@@ -349,6 +384,8 @@ jobs:
     file: pcf-pipelines/tasks/toggle-errands/task.yml
     params:
       ENABLE_ERRANDS: {{enable_errands}}
+      OPSMAN_CLIENT_ID: {{opsman_client_id}}
+      OPSMAN_CLIENT_SECRET: {{opsman_client_secret}}
       OPSMAN_USERNAME: {{opsman_admin_username}}
       OPSMAN_PASSWORD: {{opsman_admin_password}}
       OPSMAN_DOMAIN_OR_IP_ADDRESS: {{opsman_domain_or_ip_address}}
@@ -361,10 +398,10 @@ jobs:
       resource: {{sso_resource_name}}
       passed: [regulator]
       trigger: true
-      params:
-        globs:
-        - "*pivotal"
-    - get: tool-om
+#      params:
+#        globs:
+#        - "*pivotal"
+#    - get: tool-om
       params:
         globs:
         - {{sso_product_globs}}
@@ -374,8 +411,10 @@ jobs:
     params:
       IAAS: {{iaas_type}}
       OPSMAN_DOMAIN_OR_IP_ADDRESS: {{opsman_domain_or_ip_address}}
-      OPSMAN_USERNAME: {{opsman_admin_username}}
-      OPSMAN_PASSWORD: {{opsman_admin_password}}
+      OPSMAN_CLIENT_ID: {{opsman_client_id}}
+      OPSMAN_CLIENT_SECRET: {{opsman_client_secret}}
+      OPS_MGR_USR: {{opsman_admin_username}}
+      OPS_MGR_PWD: {{opsman_admin_password}}
       PIVNET_API_TOKEN: {{pivnet_token}}
       NO_PROXY: ""
       OM_IP: ""
@@ -383,6 +422,8 @@ jobs:
   - task: stage-tile
     file: pcf-pipelines/tasks/stage-product/task.yml
     params:
+      OPSMAN_CLIENT_ID: {{opsman_client_id}}
+      OPSMAN_CLIENT_SECRET: {{opsman_client_secret}}
       OPSMAN_USERNAME: {{opsman_admin_username}}
       OPSMAN_PASSWORD: {{opsman_admin_password}}
       OPSMAN_DOMAIN_OR_IP_ADDRESS: {{opsman_domain_or_ip_address}}
@@ -391,6 +432,8 @@ jobs:
     file: pcf-pipelines/tasks/toggle-errands/task.yml
     params:
       ENABLE_ERRANDS: {{enable_errands}}
+      OPSMAN_CLIENT_ID: {{opsman_client_id}}
+      OPSMAN_CLIENT_SECRET: {{opsman_client_secret}}
       OPSMAN_USERNAME: {{opsman_admin_username}}
       OPSMAN_PASSWORD: {{opsman_admin_password}}
       OPSMAN_DOMAIN_OR_IP_ADDRESS: {{opsman_domain_or_ip_address}}
@@ -403,10 +446,10 @@ jobs:
       resource: {{cc_resource_name}}
       passed: [regulator]
       trigger: true
-      params:
-        globs:
-        - "*pivotal"
-    - get: tool-om
+  #    params:
+  #      globs:
+  #      - "*pivotal"
+  #  - get: tool-om
       params:
         globs:
         - {{cc_product_globs}}
@@ -416,8 +459,10 @@ jobs:
     params:
       IAAS: {{iaas_type}}
       OPSMAN_DOMAIN_OR_IP_ADDRESS: {{opsman_domain_or_ip_address}}
-      OPSMAN_USERNAME: {{opsman_admin_username}}
-      OPSMAN_PASSWORD: {{opsman_admin_password}}
+      OPSMAN_CLIENT_ID: {{opsman_client_id}}
+      OPSMAN_CLIENT_SECRET: {{opsman_client_secret}}
+      OPS_MGR_USR: {{opsman_admin_username}}
+      OPS_MGR_PWD: {{opsman_admin_password}}
       PIVNET_API_TOKEN: {{pivnet_token}}
       NO_PROXY: ""
       OM_IP: ""
@@ -425,6 +470,8 @@ jobs:
   - task: stage-tile
     file: pcf-pipelines/tasks/stage-product/task.yml
     params:
+      OPSMAN_CLIENT_ID: {{opsman_client_id}}
+      OPSMAN_CLIENT_SECRET: {{opsman_client_secret}}
       OPSMAN_USERNAME: {{opsman_admin_username}}
       OPSMAN_PASSWORD: {{opsman_admin_password}}
       OPSMAN_DOMAIN_OR_IP_ADDRESS: {{opsman_domain_or_ip_address}}
@@ -433,6 +480,8 @@ jobs:
     file: pcf-pipelines/tasks/toggle-errands/task.yml
     params:
       ENABLE_ERRANDS: {{enable_errands}}
+      OPSMAN_CLIENT_ID: {{opsman_client_id}}
+      OPSMAN_CLIENT_SECRET: {{opsman_client_secret}}
       OPSMAN_USERNAME: {{opsman_admin_username}}
       OPSMAN_PASSWORD: {{opsman_admin_password}}
       OPSMAN_DOMAIN_OR_IP_ADDRESS: {{opsman_domain_or_ip_address}}
@@ -445,10 +494,10 @@ jobs:
       resource: {{rabbit_resource_name}}
       passed: [regulator]
       trigger: true
-      params:
-        globs:
-        - "*pivotal"
-    - get: tool-om
+#      params:
+#        globs:
+#        - "*pivotal"
+#    - get: tool-om
       params:
         globs:
         - {{rabbit_product_globs}}
@@ -458,8 +507,10 @@ jobs:
     params:
       IAAS: {{iaas_type}}
       OPSMAN_DOMAIN_OR_IP_ADDRESS: {{opsman_domain_or_ip_address}}
-      OPSMAN_USERNAME: {{opsman_admin_username}}
-      OPSMAN_PASSWORD: {{opsman_admin_password}}
+      OPSMAN_CLIENT_ID: {{opsman_client_id}}
+      OPSMAN_CLIENT_SECRET: {{opsman_client_secret}}
+      OPS_MGR_USR: {{opsman_admin_username}}
+      OPS_MGR_PWD: {{opsman_admin_password}}
       PIVNET_API_TOKEN: {{pivnet_token}}
       NO_PROXY: ""
       OM_IP: ""
@@ -467,6 +518,8 @@ jobs:
   - task: stage-tile
     file: pcf-pipelines/tasks/stage-product/task.yml
     params:
+      OPSMAN_CLIENT_ID: {{opsman_client_id}}
+      OPSMAN_CLIENT_SECRET: {{opsman_client_secret}}
       OPSMAN_USERNAME: {{opsman_admin_username}}
       OPSMAN_PASSWORD: {{opsman_admin_password}}
       OPSMAN_DOMAIN_OR_IP_ADDRESS: {{opsman_domain_or_ip_address}}
@@ -475,6 +528,8 @@ jobs:
     file: pcf-pipelines/tasks/toggle-errands/task.yml
     params:
       ENABLE_ERRANDS: {{enable_errands}}
+      OPSMAN_CLIENT_ID: {{opsman_client_id}}
+      OPSMAN_CLIENT_SECRET: {{opsman_client_secret}}
       OPSMAN_USERNAME: {{opsman_admin_username}}
       OPSMAN_PASSWORD: {{opsman_admin_password}}
       OPSMAN_DOMAIN_OR_IP_ADDRESS: {{opsman_domain_or_ip_address}}
@@ -487,10 +542,10 @@ jobs:
       resource: {{mysqlv2_resource_name}}
       passed: [regulator]
       trigger: true
-      params:
-        globs:
-        - "*pivotal"
-    - get: tool-om
+#      params:
+#        globs:
+#        - "*pivotal"
+#    - get: tool-om
       params:
         globs:
         - {{mysqlv2_product_globs}}
@@ -500,8 +555,10 @@ jobs:
     params:
       IAAS: {{iaas_type}}
       OPSMAN_DOMAIN_OR_IP_ADDRESS: {{opsman_domain_or_ip_address}}
-      OPSMAN_USERNAME: {{opsman_admin_username}}
-      OPSMAN_PASSWORD: {{opsman_admin_password}}
+      OPSMAN_CLIENT_ID: {{opsman_client_id}}
+      OPSMAN_CLIENT_SECRET: {{opsman_client_secret}}
+      OPS_MGR_USR: {{opsman_admin_username}}
+      OPS_MGR_PWD: {{opsman_admin_password}}
       PIVNET_API_TOKEN: {{pivnet_token}}
       NO_PROXY: ""
       OM_IP: ""
@@ -509,6 +566,8 @@ jobs:
   - task: stage-tile
     file: pcf-pipelines/tasks/stage-product/task.yml
     params:
+      OPSMAN_CLIENT_ID: {{opsman_client_id}}
+      OPSMAN_CLIENT_SECRET: {{opsman_client_secret}}
       OPSMAN_USERNAME: {{opsman_admin_username}}
       OPSMAN_PASSWORD: {{opsman_admin_password}}
       OPSMAN_DOMAIN_OR_IP_ADDRESS: {{opsman_domain_or_ip_address}}
@@ -517,18 +576,19 @@ jobs:
     file: pcf-pipelines/tasks/toggle-errands/task.yml
     params:
       ENABLE_ERRANDS: {{enable_errands}}
+      OPSMAN_CLIENT_ID: {{opsman_client_id}}
+      OPSMAN_CLIENT_SECRET: {{opsman_client_secret}}
       OPSMAN_USERNAME: {{opsman_admin_username}}
       OPSMAN_PASSWORD: {{opsman_admin_password}}
       OPSMAN_DOMAIN_OR_IP_ADDRESS: {{opsman_domain_or_ip_address}}
 
 - name: apply-changes-now
   plan:
-  - get: pcf-pipelines
-  - get: tool-om
-    params:
-      globs:
-      - om-linux
+
+
   - aggregate:
+    - get: pcf-pipelines
+    #- get: pivnet-product
     - get: schedule-apply-changes {{schedule-apply-changes-time-window-start}} to {{schedule-apply-changes-time-window-stop}}
       trigger: true
     - get: {{ert_resource_name}}
@@ -549,11 +609,15 @@ jobs:
       passed: [upgrade-rabbit]
     - get: {{mysqlv2_resource_name}}
       passed: [upgrade-mysqlv2]
+      params:
+        globs: [ ]
 
   - task: apply-changes
     file: pcf-pipelines/tasks/apply-changes/task.yml
     params:
+      OPSMAN_CLIENT_ID: {{opsman_client_id}}
+      OPSMAN_CLIENT_SECRET: {{opsman_client_secret}}
       OPSMAN_USERNAME: {{opsman_admin_username}}
       OPSMAN_PASSWORD: {{opsman_admin_password}}
-      OPSMAN_URI: {{opsman_uri}}
+      OPSMAN_DOMAIN_OR_IP_ADDRESS: {{opsman_domain_or_ip_address}}
       OPSMAN_TIMEOUT: {{opsman_timeout_seconds}}
