@@ -55,17 +55,18 @@ UNSTAGED_PRODUCT=$(echo "$UNSTAGED_ALL" | jq \
 if [ "$(echo $UNSTAGED_PRODUCT | jq '. | length')" -ne "1" ]; then
   echo "Need exactly one unstaged build for $PRODUCT_NAME version $desired_version"
   jq -n "$UNSTAGED_PRODUCT"
-  exit 1
+  #allow to continue even if on latest.
+  echo "nothing to do"
+else
+  full_version=$(echo "$UNSTAGED_PRODUCT" | jq -r '.[].product_version')
+
+  om-linux --target "https://${OPSMAN_DOMAIN_OR_IP_ADDRESS}" \
+    --skip-ssl-validation \
+    --client-id "${OPSMAN_CLIENT_ID}" \
+    --client-secret "${OPSMAN_CLIENT_SECRET}" \
+    --username "${OPSMAN_USERNAME}" \
+    --password "${OPSMAN_PASSWORD}" \
+    stage-product \
+    --product-name "${PRODUCT_NAME}" \
+    --product-version "${full_version}"
 fi
-
-full_version=$(echo "$UNSTAGED_PRODUCT" | jq -r '.[].product_version')
-
-om-linux --target "https://${OPSMAN_DOMAIN_OR_IP_ADDRESS}" \
-  --skip-ssl-validation \
-  --client-id "${OPSMAN_CLIENT_ID}" \
-  --client-secret "${OPSMAN_CLIENT_SECRET}" \
-  --username "${OPSMAN_USERNAME}" \
-  --password "${OPSMAN_PASSWORD}" \
-  stage-product \
-  --product-name "${PRODUCT_NAME}" \
-  --product-version "${full_version}"
