@@ -29,13 +29,6 @@ resources:
     branch: prod
     username: {{git_private_key}}
 
-#- name: tool-om
-#  type: github-release
-#  source:
-#    user: pivotal-cf
-#    repository: om
-#    access_token: {{git_private_key}}
-
 - name: {{ert_resource_name}}
   type: pivnet
   check_every: {{pivnet_poll_interval}}
@@ -139,15 +132,41 @@ jobs:
   - get: schedule {{scheduler-time-window-start}} to {{scheduler-time-window-stop}}
     trigger: true
   - get: {{ert_resource_name}}
+    params:
+      globs:
+      - {{ert_product_globs}}
   - get: {{redis_resource_name}}
+    params:
+      globs:
+      - {{redis_product_globs}}
   - get: {{jmx_resource_name}}
+    params:
+      globs:
+      - {{jmx_product_globs}}
   - get: {{metrics_resource_name}}
+    params:
+      globs:
+      - {{metrics_product_globs}}
   - get: {{mysql_resource_name}}
+    params:
+      globs:
+      - {{mysql_product_globs}}
   - get: {{sso_resource_name}}
+    params:
+      globs:
+      - {{sso_product_globs}}
   - get: {{cc_resource_name}}
+    params:
+      globs:
+      - {{cc_product_globs}}
   - get: {{rabbit_resource_name}}
+    params:
+      globs:
+      - {{rabbit_product_globs}}
   - get: {{mysqlv2_resource_name}}
-    params: { globs: [] }
+    params:
+      globs:
+      - {{mysqlv2_product_globs}}
 
 - name: upgrade-ert
   plan:
@@ -157,10 +176,6 @@ jobs:
       resource: {{ert_resource_name}}
       passed: [regulator]
       trigger: true
-  #    params:
-  #      globs:
-  #      - "*pivotal"
-  #  - get: tool-om
       params:
         globs:
         - {{ert_product_globs}}
@@ -205,15 +220,11 @@ jobs:
       resource: {{redis_resource_name}}
       passed: [regulator]
       trigger: true
-  #    params:
-  #      globs:
-  #      - "*pivotal"
-  #  - get: tool-om
       params:
         globs:
         - {{redis_product_globs}}
 
-  - task: upload-tile
+  - task: upload-tile-and-stemcell
     file: pcf-pipelines/tasks/upload-product-and-stemcell/task.yml
     params:
       IAAS: {{iaas_type}}
@@ -253,10 +264,6 @@ jobs:
       resource: {{jmx_resource_name}}
       passed: [regulator]
       trigger: true
-  #    params:
-  #      globs:
-  #      - "*pivotal"
-  #  - get: tool-om
       params:
         globs:
         - {{jmx_product_globs}}
@@ -301,10 +308,6 @@ jobs:
       resource: {{metrics_resource_name}}
       passed: [regulator]
       trigger: true
-  #    params:
-  #      globs:
-  #      - "*pivotal"
-  #  - get: tool-om
       params:
         globs:
         - {{metrics_product_globs}}
@@ -331,7 +334,6 @@ jobs:
       OPSMAN_PASSWORD: {{opsman_admin_password}}
       OPSMAN_DOMAIN_OR_IP_ADDRESS: {{opsman_domain_or_ip_address}}
 
-
   - task: toggle-errands
     file: pcf-pipelines/tasks/toggle-errands/task.yml
     params:
@@ -350,10 +352,6 @@ jobs:
       resource: {{mysql_resource_name}}
       passed: [regulator]
       trigger: true
-#      params:
-#        globs:
-#        - "*pivotal"
-#    - get: tool-om
       params:
         globs:
         - {{mysql_product_globs}}
@@ -398,10 +396,6 @@ jobs:
       resource: {{sso_resource_name}}
       passed: [regulator]
       trigger: true
-#      params:
-#        globs:
-#        - "*pivotal"
-#    - get: tool-om
       params:
         globs:
         - {{sso_product_globs}}
@@ -446,10 +440,6 @@ jobs:
       resource: {{cc_resource_name}}
       passed: [regulator]
       trigger: true
-  #    params:
-  #      globs:
-  #      - "*pivotal"
-  #  - get: tool-om
       params:
         globs:
         - {{cc_product_globs}}
@@ -494,10 +484,6 @@ jobs:
       resource: {{rabbit_resource_name}}
       passed: [regulator]
       trigger: true
-#      params:
-#        globs:
-#        - "*pivotal"
-#    - get: tool-om
       params:
         globs:
         - {{rabbit_product_globs}}
@@ -542,10 +528,6 @@ jobs:
       resource: {{mysqlv2_resource_name}}
       passed: [regulator]
       trigger: true
-#      params:
-#        globs:
-#        - "*pivotal"
-#    - get: tool-om
       params:
         globs:
         - {{mysqlv2_product_globs}}
@@ -584,33 +566,55 @@ jobs:
 
 - name: apply-changes-now
   plan:
-
-
   - aggregate:
     - get: pcf-pipelines
-    #- get: pivnet-product
     - get: schedule-apply-changes {{schedule-apply-changes-time-window-start}} to {{schedule-apply-changes-time-window-stop}}
       trigger: true
     - get: {{ert_resource_name}}
       passed: [upgrade-ert]
+      params:
+        globs:
+        - {{ert_product_globs}}
     - get: {{redis_resource_name}}
       passed: [upgrade-redis]
+      params:
+        globs:
+        - {{redis_product_globs}}
     - get: {{jmx_resource_name}}
       passed: [upgrade-jmx]
+      params:
+        globs:
+        - {{jmx_product_globs}}
     - get: {{metrics_resource_name}}
       passed: [upgrade-metrics]
+      params:
+        globs:
+        - {{metrics_product_globs}}
     - get: {{mysql_resource_name}}
       passed: [upgrade-mysql]
+      params:
+        globs:
+        - {{mysql_product_globs}}
     - get: {{sso_resource_name}}
       passed: [upgrade-sso]
+      params:
+        globs:
+        - {{sso_product_globs}}
     - get: {{cc_resource_name}}
       passed: [upgrade-cc]
+      params:
+        globs:
+        - {{cc_product_globs}}
     - get: {{rabbit_resource_name}}
       passed: [upgrade-rabbit]
+      params:
+        globs:
+        - {{rabbit_product_globs}}
     - get: {{mysqlv2_resource_name}}
       passed: [upgrade-mysqlv2]
       params:
-        globs: [ ]
+        globs:
+        - {{mysqlv2_product_globs}}
 
   - task: apply-changes
     file: pcf-pipelines/tasks/apply-changes/task.yml
