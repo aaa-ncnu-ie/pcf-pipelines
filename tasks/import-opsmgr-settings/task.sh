@@ -20,8 +20,15 @@ function main() {
   local cwd
   cwd="${1}"
 
-  chmod +x tool-om/om-linux
-  local om="tool-om/om-linux"
+wget -q -O - https://raw.githubusercontent.com/starkandwayne/homebrew-cf/master/public.key | apt-key add -
+echo "deb http://apt.starkandwayne.com stable main" | tee /etc/apt/sources.list.d/starkandwayne.list
+apt-get update
+
+apt-get install om
+
+
+  #chmod +x tool-om/om-linux
+  #local om="tool-om/om-linux"
 
   printf "Waiting for %s to come up" "$OPSMAN_DOMAIN_OR_IP_ADDRESS"
   until $(curl --output /dev/null --silent --head --fail -k https://${OPSMAN_DOMAIN_OR_IP_ADDRESS}); do
@@ -30,7 +37,7 @@ function main() {
   done
   printf '\n'
 
-  om-linux --target "https://${OPSMAN_DOMAIN_OR_IP_ADDRESS}" \
+  om --target "https://${OPSMAN_DOMAIN_OR_IP_ADDRESS}" \
       --skip-ssl-validation \
       --request-timeout 86400 \
       import-installation \
