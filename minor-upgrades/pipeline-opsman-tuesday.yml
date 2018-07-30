@@ -63,7 +63,7 @@ resources:
     start: {{scheduler-time-window-start}}
     stop: {{scheduler-time-window-stop}}
     location: {{scheduler-time-location}}
-    days: [Tuesday]
+    days: [Thursday]
 
 jobs:
 - name: regulator
