@@ -110,15 +110,6 @@ resources:
     product_version: {{mysqlv2_product_version}}
     sort_by: semver
 
-- name: {{crunchy_resource_name}}
-  type: pivnet
-  check_every: {{pivnet_poll_interval}}
-  source:
-    api_token: {{pivnet_token}}
-    product_slug: {{crunchy_product_slug}}
-    product_version: {{crunchy_product_version}}
-    sort_by: semver
-
 - name: {{datadog_resource_name}}
   type: pivnet
   check_every: {{pivnet_poll_interval}}
@@ -194,10 +185,6 @@ jobs:
     params:
       globs:
       - {{mysqlv2_product_globs}}
-  - get: {{crunchy_resource_name}}
-    params:
-      globs:
-      - {{crunchy_products_globs}}
   - get: {{datadog_resource_name}}
     params:
       globs:
@@ -603,49 +590,6 @@ jobs:
       OPSMAN_PASSWORD: {{opsman_admin_password}}
       OPSMAN_DOMAIN_OR_IP_ADDRESS: {{opsman_domain_or_ip_address}}
 
-- name: upgrade-crunchy
-  plan:
-  - aggregate:
-    - get: pcf-pipelines
-    - get: pivnet-product
-      resource: {{crunchy_resource_name}}
-      passed: [regulator]
-      trigger: true
-      params:
-        globs:
-        - {{crunchy_products_globs}}
-
-  - task: upload-tile-and-stemcell
-    file: pcf-pipelines/tasks/upload-product-and-stemcell/task.yml
-    params:
-      IAAS: {{iaas_type}}
-      OPSMAN_DOMAIN_OR_IP_ADDRESS: {{opsman_domain_or_ip_address}}
-      OPSMAN_CLIENT_ID: {{opsman_client_id}}
-      OPSMAN_CLIENT_SECRET: {{opsman_client_secret}}
-      OPS_MGR_USR: {{opsman_admin_username}}
-      OPS_MGR_PWD: {{opsman_admin_password}}
-      PIVNET_API_TOKEN: {{pivnet_token}}
-      NO_PROXY: ""
-      OM_IP: ""
-
-  - task: stage-tile
-    file: pcf-pipelines/tasks/stage-product/task.yml
-    params:
-      OPSMAN_CLIENT_ID: {{opsman_client_id}}
-      OPSMAN_CLIENT_SECRET: {{opsman_client_secret}}
-      OPSMAN_USERNAME: {{opsman_admin_username}}
-      OPSMAN_PASSWORD: {{opsman_admin_password}}
-      OPSMAN_DOMAIN_OR_IP_ADDRESS: {{opsman_domain_or_ip_address}}
-
-  - task: toggle-errands
-    file: pcf-pipelines/tasks/toggle-errands/task.yml
-    params:
-      ENABLE_ERRANDS: {{enable_errands}}
-      OPSMAN_CLIENT_ID: {{opsman_client_id}}
-      OPSMAN_CLIENT_SECRET: {{opsman_client_secret}}
-      OPSMAN_USERNAME: {{opsman_admin_username}}
-      OPSMAN_PASSWORD: {{opsman_admin_password}}
-      OPSMAN_DOMAIN_OR_IP_ADDRESS: {{opsman_domain_or_ip_address}}
 
 - name: upgrade-datadog
   plan:
@@ -788,6 +732,16 @@ jobs:
       params:
         globs:
         - {{mysqlv2_product_globs}}
+    - get: {{datadog_resource_name}}
+      passed: [upgrade-datadog]
+      params:
+        globs:
+        - {{datadog_products_globs}}
+    - get: {{spring_cloud_data_flow_resource_name}}
+      passed: [upgrade-spring_cloud_data_flow]
+      params:
+        globs:
+        - {{spring_cloud_data_flow_products_globs}}
 
   - task: apply-changes
     file: pcf-pipelines/tasks/apply-changes/task.yml
